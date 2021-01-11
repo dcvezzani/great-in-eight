@@ -1,18 +1,18 @@
 <template>
   <div class="day-tally" id="day-tally" v-if="loaded">
 
-<div style="display: none; ">
-  <input type="range" id="volume" name="volume"
-         min="0" max="11" v-model="volume" @change="onChangeVolume">
-  <label for="volume">Volume</label>
-  <div> {{ volume }} </div>
-</div>
+<!-- <div style="display: none; "> -->
+<!--   <input type="range" id="volume" name="volume" -->
+<!--          min="0" max="11" v-model="volume" @change="onChangeVolume"> -->
+<!--   <label for="volume">Volume</label> -->
+<!--   <div> {{ volume }} </div> -->
+<!-- </div> -->
 
     <div v-for="(component, index) in data" :key="index">
 
-      <div v-if="component.type == 'dayOfWeek'">
-        <h3>{{component.value}} ({{totalPoints}})</h3>
-      </div>
+      <!-- <div v-if="component.type == 'dayOfWeek'"> -->
+      <!--   <h3>{{component.value}} ({{totalPoints}})</h3> -->
+      <!-- </div> -->
 
       <div v-if="component.type == 'positiveFoods'">
         <h3>{{component.title}}</h3>
@@ -322,15 +322,16 @@ element.addEventListener('load', e => console.log(e.detail.text()));
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
-  margin: 40px 0 0;
-  font-weight: 700;
+  margin: 20px 0 0;
+  font-size: 12pt;
+  font-weight: 600;
 }
 ul {
   list-style-type: none;
   padding: 0;
 }
-xli {
-  display: inline-block;
+li {
+  display: block;
   margin: 0 10px;
 }
 a {
@@ -343,7 +344,4 @@ a {
   margin-top: 1em;
 }
 
-.footer-spacer {
-  height: 8em;
-}
 </style>

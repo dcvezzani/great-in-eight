@@ -1,216 +1,80 @@
 <template>
   <div class="great-to-eight" v-if="loaded">
+<!-- <div class="navbar"> -->
+<!--   <a href="#home">Home</a> -->
+<!--   <a href="#news">News</a> -->
+<!--   <a href="#contact">Contact</a> -->
+<!-- </div> -->
 
-    <tabs>
-      <tab v-for="day in days" :key="day.name" :name="day.name" :selected="day.selected" :click="() => loadDayTally(day.name)">
-      </tab>
-    </tabs>
-    
-    <div>{{message}}</div>
-    <div>Points for the week: {{totalPoints}}</div>
-    <button @click="save">Save</button>
+    <div class="header">
+      <tabs>
+        <tab v-for="day in days" :key="day.name" :name="day.name" :selected="day.selected" :click="() => loadDayTally(day.name)">
+        </tab>
+      </tabs>
 
-    <DayTally :data="payload" v-if="payload"></DayTally>
+      <div class="info">
+        <ul>
+          <li><div>Points for the week: {{totalPoints}}</div></li>
+          <li><div>{{currentDay}}: {{totalPointsForCurrentDay}}</div></li>
+          <li><button @click="save">Save</button></li>
+        </ul>
+      </div>
+    </div>
+      
+    <div class="content-pane">
+      <div>{{message}}</div>
+
+      <DayTally :data="payload" v-if="payload"></DayTally>
+    </div>
+
+    <div class="info page-footer">
+      <ul>
+        <li><div></div></li>
+        <li><div></div></li>
+        <li>
+          <select id="pageFooterActions" name="pageFooterActions">
+            <option value="do-nothing">- Select action -</option>
+            <option value="reset-page">Reset day from last save</option>
+            <option value="reset-page">Reset week from last save</option>
+            <option value="reset-page">Reset day as new</option>
+            <option value="reset-week">Reset week as new</option>
+          </select>
+          <button>Reset</button>
+        </li>
+      </ul>
+    </div>
     
   </div>
 </template>
 
 <script>
 
-/* (async () => { */
-/*   const myHeaders = new Headers(); */
-/*   myHeaders.append('Content-Type', 'application/json'); */
-/*   /1* myHeaders.append('Content-Length', content.length.toString()); *1/ */
-/*   /1* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); *1/ */
-
-/*   const myGetRequest = new Request('http://localhost:3010/', { */
-/*     method: 'GET', */
-/*     headers: myHeaders, */
-/*     mode: 'cors', */
-/*     cache: 'default', */
-/*   }); */
-
-/*   let data = await fetch(myGetRequest) */
-/*   .then(response => response.json()) */
-/*   console.log(">>>data", data) */
-
-/*   const myPostRequest = new Request('http://localhost:3010/', { */
-/*     method: 'POST', */
-/*     headers: myHeaders, */
-/*     mode: 'cors', */
-/*     cache: 'default', */
-/*     body: JSON.stringify(data) // body data type must match "Content-Type" header */
-/*   }); */
-
-/*   data = await fetch(myPostRequest) */
-/*   .then(response => response.json()) */
-/*   console.log(">>>data [2]", data) */
-/* })() */
-
-const xpayload = [
-  { type: 'weekOfPeriod', 
-    name: 'weekOfPeriod', 
-    value: '1',
-  },
-  { type: 'dayOfWeek', 
-    name: 'dayOfWeek', 
-    value: 'Mon',
-  },
-  { type: 'positiveFoods', 
-    name: 'positiveFoods', 
-    title: 'Positive Foods',
-    selectedId: "0", 
-    options: [
-      {id: "0",  points: 0},
-      {id: "1",  points: 1, name: ''},
-      {id: "2",  points: 1, name: ''},
-      {id: "3",  points: 1, name: ''},
-      {id: "4",  points: 1, name: ''},
-      {id: "5",  points: 1, name: ''},
-    ],
-    fruitsAndVegetables: {
-      points: 10, 
-      positiveFoodsPointsRequirement: 5,
-      selectedId: "0", 
-      options: [
-        {id: "0",  points: 0},
-        {id: "1",  points: 1, name: ''},
-        {id: "2",  points: 1, name: ''},
-        {id: "3",  points: 1, name: ''},
-        {id: "4",  points: 1, name: ''},
-        {id: "5",  points: 1, name: ''},
-      ],
-    },
-  },
-  { type: 'negativeFoods', 
-    name: 'negativeFoods', 
-    title: 'Negative Foods',
-    selectedId: "0", 
-    options: [
-      {id: "0",  points: 0},
-      {id: "1",  points: -1, name: ''},
-      {id: "2",  points: -1, name: ''},
-      {id: "3",  points: -1, name: ''},
-      {id: "4",  points: -1, name: ''},
-      {id: "5",  points: -1, name: ''},
-      {id: "6",  points: -1, name: ''},
-      {id: "7",  points: -1, name: ''},
-      {id: "8",  points: -1, name: ''},
-      {id: "9",  points: -1, name: ''},
-      {id: "10", points: -1, name: ''},
-    ],
-  },
-  { type: 'water', 
-    name: 'water', 
-    title: 'Water',
-    points: 10, 
-    selectedId: "0", 
-    rules: [
-      {week: "1", cups: 4},
-      {week: "2", cups: 5},
-      {week: "3", cups: 6},
-      {week: "4", cups: 7},
-      {week: "default", cups: 8},
-    ],
-    options: [
-      {id: "0", cups: 0},
-      {id: "1", cups: 1},
-      {id: "2", cups: 1},
-      {id: "3", cups: 1},
-      {id: "4", cups: 1},
-      {id: "5", cups: 1},
-      {id: "6", cups: 1},
-      {id: "7", cups: 1},
-      {id: "8", cups: 1},
-    ]
-  },
-  { type: 'afterEight', 
-    name: 'afterEight', 
-    title: 'After 8:00 pm',
-    points: 5,
-    options: [
-      {name: 'nothingEaten', label: 'Nothing consumed?', value: false},
-      {name: 'fruitOrVegetable', label: 'Ate 1 serving fruit/vegetable?', value: false},
-    ],
-  },
-  { type: 'exercise', 
-    name: 'exercise', 
-    title: 'Exercise',
-    selectedId: '0',
-    rules: [
-      {name: "exerciseOnRestDay", requiredOption: '31_plus', points: 10},
-    ],
-    options: [
-      {
-        id: "0",
-        label: 'None',
-        name: 'none',
-        points: 0,
-      },
-      {
-        id: "1",
-        label: '15 - 20 min',
-        name: '15_20',
-        points: 10,
-      },
-      {
-        id: "2",
-        label: '20 - 30 min',
-        name: '20_30',
-        points: 15,
-      },
-      {
-        id: "3",
-        label: '31 min',
-        name: '31_plus',
-        points: 20,
-      },
-    ],
-  },
-  { type: 'simple-checkbox', 
-    name: 'dailyGreatness', 
-    title: 'Daily Greatness',
-    points: 5,
-    options: [
-      {
-        name: 'dailyGreatness',
-        label: 'Daily greatness achieved',
-        description: '',
-        performed: false,
-      }
-    ]
-  },
-  { type: 'simple-checkbox', 
-    name: 'personalPrayer', 
-    title: 'Personal Prayer',
-    points: 5,
-    options: [
-      {
-        name: 'personalPrayer',
-        label: 'Personal prayer, meditation or reflection',
-        description: '',
-        performed: false,
-      }
-    ]
-  },
-  { type: 'simple-checkbox', 
-    name: 'scriptureStudy', 
-    title: 'Scripture Study',
-    points: 5,
-    options: [
-      {
-        name: 'scriptureStudy',
-        label: 'Uplifting reading',
-        description: '',
-        performed: false,
-      }
-    ]
-  },
-]
-
 import DayTally from './DayTally.vue'
-import { calculateWeeklyPoints } from "../assets/js/points-calculator"
+import { calculateWeeklyPoints, calculatePoints } from "../assets/js/points-calculator"
 const BASE_URL = 'http://10.0.0.54:3010'
+
+const registerStickyHeader = () => {
+
+  // Get the header
+  var header = document.querySelector(".header");
+
+  console.log(">>>header", header)
+
+  // Get the offset position of the navbar
+  var sticky = header.offsetTop;
+
+  // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
+  function myFunction() {
+    if (window.pageYOffset > sticky) {
+      header.classList.add("sticky");
+    } else {
+      header.classList.remove("sticky");
+    }
+  }
+
+  // When the user scrolls the page, execute myFunction
+  window.onscroll = function() {myFunction()};
+}
 
 export default {
   name: 'GreatToEight',
@@ -223,7 +87,14 @@ export default {
   computed: {
     totalPoints() {
       return calculateWeeklyPoints(this.days)
-    }
+    },
+    totalPointsForCurrentDay() {
+      return calculatePoints(this.payload)
+    },
+    currentDay() {
+      const dayOfWeek = this.payload.find(entry => entry.name === 'dayOfWeek')
+      return (dayOfWeek) ? dayOfWeek.value : null
+    },
   },
   data() {
     return {
@@ -262,7 +133,11 @@ export default {
 
         const data = await fetch(myPostRequest)
         .then(response => response.json())
-        this.toast(data)
+        .catch(err => {
+          console.error(err)
+          return {ok: false}
+        })
+        this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
       })()
     },
     loadDayTally(theDay) {
@@ -302,13 +177,17 @@ export default {
 
       this.loadDayTally("Mon")
       this.loaded = true
+
+      setTimeout(() => {
+        registerStickyHeader();
+      }, 150)
     })()
   },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style >
 h3 {
   margin: 40px 0 0;
 }
@@ -323,4 +202,82 @@ li {
 a {
   color: #42b983;
 }
+
+.great-to-eight .header {
+  background: white;
+  border-bottom: 1px solid whitesmoke;
+  padding-bottom: 1em;
+  z-index: 100;
+}
+
+/* Page content-pane */
+.content-pane {
+  padding: 16px;
+}
+
+/* The sticky class is added to the header with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%
+}
+
+/* Add some top padding to the page content-pane to prevent sudden quick movement (as the header gets a new position at the top of the page (position:fixed and top:0) */
+.sticky + .content-pane {
+  padding-top: 102px;
+}
+
+.great-to-eight .info {
+  width: 100%;
+  padding: 0 2em;
+}
+
+.great-to-eight .info ul {
+  display: flex;
+  justify-content: space-between;
+}
+
+.great-to-eight .info ul li {
+  display: flex;
+
+}
+
+.great-to-eight .tabs {
+  width: 100%;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-right: none;
+}
+
+.great-to-eight .tabs ul {
+    flex-wrap:wrap;
+    margin: 0;
+    padding: 0;
+}
+
+.great-to-eight .tabs ul li {
+    list-style: none;
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.great-to-eight .tabs ul li:first-child {
+    border-left: none;
+}
+
+.great-to-eight .tabs ul li a {
+    display: block;
+}
+
+.great-to-eight .info.page-footer {
+  border: 1px solid whitesmoke;
+  margin-top: 4em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.great-to-eight {
+  padding-bottom: 8em;
+}
+    
 </style>
