@@ -6,6 +6,7 @@
       </tab>
     </tabs>
     
+    <div>{{message}}</div>
     <div>Points for the week: {{totalPoints}}</div>
     <button @click="save">Save</button>
 
@@ -208,7 +209,8 @@ const xpayload = [
 ]
 
 import DayTally from './DayTally.vue'
-import { calculateWeeklyPoints } from "../assets/js/points-calculator";
+import { calculateWeeklyPoints } from "../assets/js/points-calculator"
+const BASE_URL = 'http://10.0.0.54:3010'
 
 export default {
   name: 'GreatToEight',
@@ -226,6 +228,7 @@ export default {
   data() {
     return {
       payload: [], 
+      message: '',
       days: [
         {name: "Mon", selected: true},
         {name: "Tue", selected: false},
@@ -239,12 +242,17 @@ export default {
     }
   },
   methods: {
+    toast(message) {
+      this.message = message
+      console.log(">>>toast, message", message)
+      setTimeout(() => { this.message = null }, 3000)
+    },
     save() {
       (async () => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
 
-        const myPostRequest = new Request('http://localhost:3010/', {
+        const myPostRequest = new Request(BASE_URL, {
           method: 'POST',
           headers: myHeaders,
           mode: 'cors',
@@ -254,7 +262,7 @@ export default {
 
         const data = await fetch(myPostRequest)
         .then(response => response.json())
-        console.log(">>>data [2]", data)
+        this.toast(data)
       })()
     },
     loadDayTally(theDay) {
@@ -275,42 +283,25 @@ export default {
       /* myHeaders.append('Content-Length', content.length.toString()); */
       /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
-      const myGetRequest = new Request('http://localhost:3010/', {
+      const myGetRequest = new Request(BASE_URL, {
         method: 'GET',
         headers: myHeaders,
         mode: 'cors',
         cache: 'default',
       });
 
-      this.days = (await fetch(myGetRequest)
-      .then(response => response.json())).data
-      console.log(">>>data", this.days)
-
-      /* this.days = [ */
-      /*   {name: "Mon", selected: true, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /*   {name: "Tue", selected: false, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /*   {name: "Wed", selected: false, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /*   {name: "Thu", selected: false, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /*   {name: "Fri", selected: false, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /*   {name: "Sat", selected: false, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /*   {name: "Sun", selected: false, data: JSON.parse(JSON.stringify(this.payload))}, */
-      /* ] */
+      this.days = (
+        await fetch(myGetRequest)
+        .then(response => response.json())
+        .catch(err => {
+          this.message = `${err}: ${BASE_URL}`
+          this.loaded = true
+          return {data: []}
+        })
+      ).data
 
       this.loadDayTally("Mon")
-
       this.loaded = true
-
-      // const myPostRequest = new Request('http://localhost:3010/', {
-      //   method: 'POST',
-      //   headers: myHeaders,
-      //   mode: 'cors',
-      //   cache: 'default',
-      //   body: JSON.stringify(data) // body data type must match "Content-Type" header
-      // });
-
-      // data = await fetch(myPostRequest)
-      // .then(response => response.json())
-      // console.log(">>>data [2]", data)
     })()
   },
 }
