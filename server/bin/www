@@ -10,7 +10,7 @@ var http = require('http');
 // const https = require('https')
 const fs = require('fs')
 
-const CERTS_BASE_PATH = '/var/www/vhosts/vezzaniphotography.com/great-in-eight.vezzaniphotography.com/certs'
+const CERTS_BASE_PATH = `${process.env.FILE_BASE_PATH}/certs`
 
 /**
  * Get port from environment and store in Express.
