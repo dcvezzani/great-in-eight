@@ -22,10 +22,10 @@ app.use(cors());
 // app.use(express.static(path.join(__dirname, 'public')));
 
 const pathForEnvironment = (path) => {
-  return (process.env.NODE_ENV === 'local') ? path : `/api${path}`
+  return (process.env.NODE_ENV === 'local') ? `/api${path}` : path
 }
 
-console.log(">>>pathForEnvironment('/')", pathForEnvironment('/'))
+console.log(">>>pathForEnvironment('/')", process.env.NODE_ENV, pathForEnvironment('/'))
 app.use(pathForEnvironment('/'), indexRouter);
 // app.use('/users', usersRouter);
 

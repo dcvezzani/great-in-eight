@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "xdev": "NODE_ENV=local PORT=3010 FILE_BASE_PATH=/var/www/vhosts/vezzaniphotography.com/great-in-eight.vezzaniphotography.com DEBUG=server:* npm start",
-    "dev": "PORT=3010 FILE_BASE_PATH=/Users/dcvezzani/personal-projects/great-in-eight DEBUG=server:* npm start"
+    "xdev": "PORT=3010 FILE_BASE_PATH=/var/www/vhosts/vezzaniphotography.com/great-in-eight.vezzaniphotography.com DEBUG=server:* npm start",
+    "dev": "NODE_ENV=local PORT=3010 FILE_BASE_PATH=/Users/dcvezzani/personal-projects/great-in-eight DEBUG=server:* npm start"
     
   },
   "dependencies": {
