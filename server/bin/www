@@ -6,7 +6,11 @@
 
 var app = require('../app');
 var debug = require('debug')('server:server');
-var http = require('http');
+// var http = require('http');
+const https = require('https')
+const fs = require('fs')
+
+const CERTS_BASE_PATH = '/Users/dcvezzani/personal-projects/great-in-eight/certs'
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +23,12 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+// var server = http.createServer(app);
+
+var server = https.createServer({
+  key: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.key`),
+  cert: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.cert`),
+}, app)
 
 /**
  * Listen on provided port, on all network interfaces.

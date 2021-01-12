@@ -8,6 +8,98 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
+
+    <script>
+      console.log(">>>facebook stuff")
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '429496904859517',
+          cookie     : true,
+          xfbml      : true,
+          version    : "v9.0",
+        });
+          
+        FB.AppEvents.logPageView();   
+          
+        FB.getLoginStatus(function(response) {
+          console.log(">>>response (FB.getLoginStatus)", response)
+          login()
+            // statusChangeCallback(response);
+        });
+
+
+              /*
+
+        setTimeout(() => {
+          FB.login(function(response) {
+                  console.log(">>>response (FB.login)", response)
+            // handle the response
+          }, {scope: 'public_profile,email'});              
+        }, 3000)
+
+
+        FB.logout(function(response) {
+                console.log(">>>response (FB.logout)", response)
+          // handle the response
+        });              
+     */
+              
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+
+      function facebookLogout() {
+        console.log(">>>facebookLogout")
+
+        if ( !FB.getAccessToken() ) {
+          console.log(">>>user not currently logged in; no need to logout")
+          return false
+        }
+
+        FB.logout(function(response) {
+          console.log(">>>response (FB.logout)", response)
+          logout()
+        });              
+      }
+
+      function facebookLogin() {
+        console.log(">>>facebookLogin")
+
+        FB.login(function(response) {
+          console.log(">>>response (FB.login)", response)
+          login()
+
+          // handle the response
+        }, {scope: 'public_profile,email', return_scopes: true});              
+      }
+
+      function logout() {
+        window.dispatchEvent( new CustomEvent("logout", {detail: {}}) )
+      }
+
+      function login() {
+        if ( !FB.getAccessToken() ) {
+          console.log(">>>Unable to log in; no access token active")
+          return false
+        }
+
+        FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
+          console.log(">>>response (FB.api)", apiResponse)                    
+          window.dispatchEvent( new CustomEvent("login", {detail: {userId: apiResponse.id}}) )
+        })
+      }
+    </script>    
+
+    <!-- <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="true"></div> -->
+    
+    <!-- <button onclick="facebookLogin()">Facebook Login</button> -->
+    <!-- <button onclick="facebookLogout()">Facebook Logout</button> -->
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>

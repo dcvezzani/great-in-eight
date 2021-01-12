@@ -7,7 +7,7 @@
   {
     "type": "dayOfWeek",
     "name": "dayOfWeek",
-    "value": "Mon"
+    "value": "Sun"
   },
   {
     "type": "positiveFoods",
@@ -311,5 +311,4 @@
     ]
   }
 ]
-
 

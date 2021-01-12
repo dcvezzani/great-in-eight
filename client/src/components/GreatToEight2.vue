@@ -16,7 +16,9 @@
         <ul>
           <li><div>Points for the week: {{totalPoints}}</div></li>
           <li><div>{{currentDay}}: {{totalPointsForCurrentDay}}</div></li>
-          <li><button @click="save">Save</button></li>
+          <li>
+            <button @click="save">Save</button>
+          </li>
         </ul>
       </div>
     </div>
@@ -32,14 +34,14 @@
         <li><div></div></li>
         <li><div></div></li>
         <li>
-          <select id="pageFooterActions" name="pageFooterActions">
+          <select id="pageFooterActions" name="pageFooterActions" @change="handlePageFooterActions($event, 'pageFooterActions')">
             <option value="do-nothing">- Select action -</option>
-            <option value="reset-page">Reset day from last save</option>
-            <option value="reset-page">Reset week from last save</option>
-            <option value="reset-page">Reset day as new</option>
+            <option value="reset-day-from-last-save">Reset day from last save</option>
+            <option value="reset-week-from-last-save">Reset week from last save</option>
+            <option value="reset-day">Reset day as new</option>
             <option value="reset-week">Reset week as new</option>
           </select>
-          <button>Reset</button>
+          <button @click="handlePageFooterActions($event, 'pageFooterActions')">Reset</button>
         </li>
       </ul>
     </div>
@@ -51,7 +53,7 @@
 
 import DayTally from './DayTally.vue'
 import { calculateWeeklyPoints, calculatePoints } from "../assets/js/points-calculator"
-const BASE_URL = 'http://10.0.0.54:3010'
+const BASE_URL = 'https://10.0.0.54:3010'
 
 const registerStickyHeader = () => {
 
@@ -128,7 +130,7 @@ export default {
           headers: myHeaders,
           mode: 'cors',
           cache: 'default',
-          body: JSON.stringify(this.days) // body data type must match "Content-Type" header
+            body: JSON.stringify({days: this.days, userId: this.$store.state.userId}) // body data type must match "Content-Type" header
         });
 
         const data = await fetch(myPostRequest)
@@ -149,39 +151,133 @@ export default {
         const dailyTally = document.querySelector('#day-tally')
         dailyTally.dispatchEvent( new CustomEvent("load") )
       }, 150)
-    }
+    },
+    handlePageFooterActions(event, elementId) {
+        const target = document.getElementById(elementId)
+        // console.log(">>>target", target)
+        const option = target.options[target.selectedIndex]
+        // console.log(">>>handlePageFooterActions", option.value)
+
+        switch(option.value) {
+          case 'reset-week': {
+            this.loadNewFormData()
+            break;
+          }
+          case 'reset-day': {
+            this.loadNewFormData(this.currentDay)
+            break;
+          }
+          case 'reset-week-from-last-save': {
+            this.loadCurrentUserData()
+            break;
+          }
+          case 'reset-day-from-last-save': {
+            this.loadCurrentUserData(this.currentDay)
+            break;
+          }
+        }
+    },
+    loadNewFormData(currentDay=null) {
+      (async () => {
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/json');
+        /* myHeaders.append('Content-Length', content.length.toString()); */
+        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+
+        const url = BASE_URL
+        const myGetRequest = new Request(url, {
+          method: 'GET',
+          headers: myHeaders,
+          mode: 'cors',
+          cache: 'default',
+        });
+
+        const dailyTemplate = (
+          await fetch(myGetRequest)
+          .then(response => response.json())
+          .catch(err => {
+              console.error(`${err}: ${url}`)
+            this.message = `${err}: ${url}`
+            this.loaded = true
+            return {data: []}
+          })
+        ).data
+
+        const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        // [...new Array(7)]
+        let selected = true
+        const days = daysOfWeek.map(dayName => {
+            let day = JSON.parse(JSON.stringify(dailyTemplate))
+            day.find(entry => entry.type === 'dayOfWeek').value = dayName
+            day = {name: dayName, selected, data: day}
+            selected = false
+            return day
+        })
+
+        if (currentDay) {
+            const idx = this.days.findIndex(day => day.name === currentDay)
+            console.log(">>>idx", idx)
+            this.days[idx] = days[idx]
+
+        } else {
+          this.days = days
+        }
+
+        this.loadDayTally("Mon")
+        this.loaded = true
+
+        setTimeout(() => {
+          registerStickyHeader();
+        }, 150)
+      })()
+          
+    },
+    loadCurrentUserData(currentDay=null) {
+      (async () => {
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/json');
+        /* myHeaders.append('Content-Length', content.length.toString()); */
+        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+
+        const url = `${BASE_URL}?userId=${this.$store.state.userId}`
+        const myGetRequest = new Request(url, {
+          method: 'GET',
+          headers: myHeaders,
+          mode: 'cors',
+          cache: 'default',
+        });
+
+        const days = (
+          await fetch(myGetRequest)
+          .then(response => response.json())
+          .catch(err => {
+            this.message = `${err}: ${url}`
+            this.loaded = true
+            return {data: []}
+          })
+        ).data
+
+        if (currentDay) {
+            const idx = this.days.findIndex(day => day.name === currentDay)
+            console.log(">>>idx", idx)
+            this.days[idx] = days[idx]
+
+        } else {
+          this.days = days
+        }
+
+        this.loadDayTally("Mon")
+        this.loaded = true
+
+        setTimeout(() => {
+          registerStickyHeader();
+        }, 150)
+      })()
+          
+    },
   },
   mounted() {
-    (async () => {
-      const myHeaders = new Headers();
-      myHeaders.append('Content-Type', 'application/json');
-      /* myHeaders.append('Content-Length', content.length.toString()); */
-      /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
-
-      const myGetRequest = new Request(BASE_URL, {
-        method: 'GET',
-        headers: myHeaders,
-        mode: 'cors',
-        cache: 'default',
-      });
-
-      this.days = (
-        await fetch(myGetRequest)
-        .then(response => response.json())
-        .catch(err => {
-          this.message = `${err}: ${BASE_URL}`
-          this.loaded = true
-          return {data: []}
-        })
-      ).data
-
-      this.loadDayTally("Mon")
-      this.loaded = true
-
-      setTimeout(() => {
-        registerStickyHeader();
-      }, 150)
-    })()
+    this.loadCurrentUserData()
   },
 }
 </script>

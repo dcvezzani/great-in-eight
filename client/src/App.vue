@@ -1,12 +1,57 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <span v-if="$store.getters.isLoggedIn">
+        <router-link to="/">Home</router-link> |
+      </span>
+      <router-link to="/about">About</router-link> |
+      <span v-if="$store.getters.isLoggedIn">
+        <a href="#logout" onclick="facebookLogout()">Logout</a>
+      </span>
+      <span v-if="!$store.getters.isLoggedIn">
+        <a href="#login" onclick="facebookLogin()">Login</a>
+      </span>
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'App',
+  props: {
+  },
+  methods: {
+    setUserId(userId) {
+      if (userId) {
+        this.$store.commit('setUserId', userId)
+      }
+    },
+    clearUserId() {
+      this.$store.commit('clearUserId')
+    },
+    loginHandler(event) {
+      this.setUserId((event.detail || {}).userId)
+      this.$router.push('/');
+    },
+    logoutHandler(event) {
+      this.clearUserId()
+      this.$router.push('/login');
+    },
+  },
+  mounted() {
+    window.addEventListener('login', this.loginHandler);
+    window.addEventListener('logout', this.logoutHandler);
+    // window.dispatchEvent( new CustomEvent("setUserId", {detail: 'user-id'}) )
+    
+  },
+  beforeDestroy() {
+    window.removeEventListener('login', this.loginHandler);
+    window.removeEventListener('logout', this.logoutHandler);
+  },
+}
+
+</script>
 
 <style>
 #app {

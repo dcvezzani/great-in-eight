@@ -256,9 +256,6 @@ export default {
       this.waterSlider = this.water.selectedId.toString()
       this.exerciseSlider = this.exercise.selectedId.toString()
 
-      console.log(">>>loading, this.exerciseSlider", this.exerciseSlider)
-
-        // {id: 1,  points: 1, name: '', isFruitVegetable: false},
       this.positiveFoodsSliderValues = this.positiveFoods.options.map((option, index) => {
         return {
           label: `${index} Pos Food`,
