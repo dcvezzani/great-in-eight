@@ -3,8 +3,8 @@ var router = express.Router();
 var fs = require('fs');
 
 // const DATA_FILE = '/Users/dcvezzani/personal-projects/great-in-eight/server/data-template.json'
-const DATA_FILE = '/Users/dcvezzani/personal-projects/great-in-eight/server/data-template.json'
-const DATA_FILE_V2 = '/Users/dcvezzani/personal-projects/great-in-eight/server/data'
+const DATA_FILE = '/var/www/vhosts/vezzaniphotography.com/great-in-eight.vezzaniphotography.com/server/data-template.json'
+const DATA_FILE_V2 = '/var/www/vhosts/vezzaniphotography.com/great-in-eight.vezzaniphotography.com/server/data'
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
