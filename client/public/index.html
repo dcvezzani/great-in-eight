@@ -10,7 +10,7 @@
   <body>
 
     <script>
-      console.log(">>>facebook stuff")
+      // console.log(">>>facebook stuff")
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '429496904859517',
@@ -23,8 +23,10 @@
           
         FB.getLoginStatus(function(response) {
           console.log(">>>response (FB.getLoginStatus)", response)
-                login({forwardRequest: false})
-            // statusChangeCallback(response);
+          // login({forwardRequest: false})
+          login()
+          // restoreSession()
+          // statusChangeCallback(response);
         });
 
 
@@ -72,11 +74,26 @@
         console.log(">>>facebookLogin")
 
         FB.login(function(response) {
-          console.log(">>>response (FB.login)", response)
+          console.log(">>>response (facebookLogin, FB.login)", response)
           login()
 
           // handle the response
         }, {scope: 'public_profile,email', return_scopes: true});              
+      }
+
+      function restoreSession() {
+        if ( !FB.getAccessToken() ) {
+          console.log(">>>Unable to log in; no access token active")
+          return false
+        }
+
+        FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
+          console.log(">>>response (restoreSession, FB.api)", apiResponse)                    
+          const detail = { userId: apiResponse.id }
+          window.dispatchEvent( new CustomEvent("restoreSession", {detail}) )
+        })
+              
+        window.dispatchEvent( new CustomEvent("restoreSession", {detail: {}}) )
       }
 
       function logout() {
@@ -84,15 +101,15 @@
       }
 
       function login(options={}) {
-        const { forwardRequest } = { forwardRequest: true, ...options }
         if ( !FB.getAccessToken() ) {
           console.log(">>>Unable to log in; no access token active")
           return false
         }
 
         FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
-          console.log(">>>response (FB.api)", apiResponse)                    
-          window.dispatchEvent( new CustomEvent("login", {detail: {userId: apiResponse.id, ...options}}) )
+          console.log(">>>response (login, FB.api)", apiResponse)                    
+          const detail = { userId: apiResponse.id, forwardRequest: true, ...options }
+          window.dispatchEvent( new CustomEvent("login", {detail}) )
         })
       }
     </script>    

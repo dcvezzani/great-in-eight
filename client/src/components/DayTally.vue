@@ -298,7 +298,7 @@ export default {
 
     setTimeout(() => {
     this.dailyTally = document.querySelector('#day-tally')
-    this.dailyTally.addEventListener("load", this.load);
+    if (this.dailyTally) this.dailyTally.addEventListener("load", this.load);
     }, 1000)
 
     /*
@@ -310,7 +310,7 @@ element.addEventListener('load', e => console.log(e.detail.text()));
     
   },
   beforeDestroy() {
-    this.dailyTally.removeEventListener("load", this.load);
+    if (this.dailyTally) this.dailyTally.removeEventListener("load", this.load);
   },
 }
 

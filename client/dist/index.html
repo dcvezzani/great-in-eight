@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico"><title>client</title><link href="/js/about.a44e9bbc.js" rel="prefetch"><link href="/css/app.6b0cd83f.css" rel="preload" as="style"><link href="/css/chunk-vendors.c94a4485.css" rel="preload" as="style"><link href="/js/app.1f093b14.js" rel="preload" as="script"><link href="/js/chunk-vendors.542e0694.js" rel="preload" as="script"><link href="/css/chunk-vendors.c94a4485.css" rel="stylesheet"><link href="/css/app.6b0cd83f.css" rel="stylesheet"></head><body><script>console.log(">>>facebook stuff")
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico"><title>client</title><link href="/js/about.a44e9bbc.js" rel="prefetch"><link href="/css/app.6b0cd83f.css" rel="preload" as="style"><link href="/css/chunk-vendors.c94a4485.css" rel="preload" as="style"><link href="/js/app.1f1cc81f.js" rel="preload" as="script"><link href="/js/chunk-vendors.542e0694.js" rel="preload" as="script"><link href="/css/chunk-vendors.c94a4485.css" rel="stylesheet"><link href="/css/app.6b0cd83f.css" rel="stylesheet"></head><body><script>// console.log(">>>facebook stuff")
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '429496904859517',
@@ -11,7 +11,8 @@
           
         FB.getLoginStatus(function(response) {
           console.log(">>>response (FB.getLoginStatus)", response)
-                login({forwardRequest: false})
+          // login({forwardRequest: false})
+          login()
             // statusChangeCallback(response);
         });
 
@@ -72,7 +73,6 @@
       }
 
       function login(options={}) {
-        const { forwardRequest } = { forwardRequest: true, ...options }
         if ( !FB.getAccessToken() ) {
           console.log(">>>Unable to log in; no access token active")
           return false
@@ -80,6 +80,7 @@
 
         FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
           console.log(">>>response (FB.api)", apiResponse)                    
-          window.dispatchEvent( new CustomEvent("login", {detail: {userId: apiResponse.id, ...options}}) )
+          const detail = { userId: apiResponse.id, forwardRequest: true, ...options }
+          window.dispatchEvent( new CustomEvent("login", {detail}) )
         })
-      }</script><noscript><strong>We're sorry but client doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div><script src="/js/chunk-vendors.542e0694.js"></script><script src="/js/app.1f093b14.js"></script></body></html>
+      }</script><noscript><strong>We're sorry but client doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div><script src="/js/chunk-vendors.542e0694.js"></script><script src="/js/app.1f1cc81f.js"></script></body></html>

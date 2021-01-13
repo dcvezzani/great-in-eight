@@ -11,6 +11,27 @@ export default {
   name: 'Login',
   props: {
   },
+  methods: {
+    sessionEstablishedHandler() {
+      if (this.$store.getters.isLoggedIn) {
+      }
+        let searchParams = new URLSearchParams(window.location.search);
+
+        if (searchParams.has("redirect")) {
+          this.$router.push({ path: `${searchParams.get("redirect")}` });
+        } else this.$router.push({ path: "/" });
+    }
+  },
+
+  mounted() {
+    window.addEventListener('sessionEstablished', this.sessionEstablishedHandler);
+    // window.dispatchEvent( new CustomEvent("sessionEstablished", {detail: null}) )
+    
+  },
+  beforeDestroy() {
+    window.removeEventListener('sessionEstablished', this.sessionEstablishedHandler);
+  },
+  
 }
 </script>
 

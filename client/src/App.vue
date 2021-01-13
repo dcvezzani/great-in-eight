@@ -31,9 +31,15 @@ export default {
     clearUserId() {
       this.$store.commit('clearUserId')
     },
+    restoreSessionHandler(event) {
+      this.setUserId((event.detail || {}).userId)
+    },
     loginHandler(event) {
       this.setUserId((event.detail || {}).userId)
-      if (event.forwardRequest) this.$router.push('/');
+      // const { forwardRequest } = event.detail
+      // if (forwardRequest) this.$router.push('/');
+
+      window.dispatchEvent( new CustomEvent("sessionEstablished", {detail: null}) )
     },
     logoutHandler(event) {
       this.clearUserId()
@@ -41,12 +47,14 @@ export default {
     },
   },
   mounted() {
+    window.addEventListener('restoreSession', this.restoreSessionHandler);
     window.addEventListener('login', this.loginHandler);
     window.addEventListener('logout', this.logoutHandler);
     // window.dispatchEvent( new CustomEvent("setUserId", {detail: 'user-id'}) )
     
   },
   beforeDestroy() {
+    window.removeEventListener('restoreSession', this.restoreSessionHandler);
     window.removeEventListener('login', this.loginHandler);
     window.removeEventListener('logout', this.logoutHandler);
   },

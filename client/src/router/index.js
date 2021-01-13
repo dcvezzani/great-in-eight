@@ -27,6 +27,9 @@ const routes = [
     path: '/deleteMyData',
     name: 'DeleteMyData',
     component: DeleteMyData,
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: '/about',
@@ -47,18 +50,29 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log(">>>to.name", to.name, store.getters.isLoggedIn)
   if (to.name === 'Login' && store.getters.isLoggedIn) {
+    const searchParams = new URLSearchParams(window.location.search);
+    console.log(">>>searchParams", searchParams)
+
+    if (searchParams.has("redirect")) {
+      console.log('searchParams.get("redirect")', searchParams.get("redirect"))
+      return next({ path: `${searchParams.get("redirect")}` })
+    }
+    
     // console.log(">>>redirecting to 'Home'")
     return next({ name: 'Home' })
   }
   
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    // console.log(">>>to.name", to.name, store.getters.isLoggedIn)
-
+    
     // this route requires auth, check if logged in
     // if not, redirect to login page.
     if (!store.getters.isLoggedIn) {
-      next({ name: 'Login' })
+    console.log(">>>going to login", { redirect: to.fullPath })
+      next({ name: 'Login', 
+        query: { redirect: to.fullPath }
+      })
     } else {
       next() // go to wherever I'm going
     }
