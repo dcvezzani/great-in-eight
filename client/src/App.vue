@@ -36,10 +36,12 @@ export default {
     },
     loginHandler(event) {
       this.setUserId((event.detail || {}).userId)
-      // const { forwardRequest } = event.detail
-      // if (forwardRequest) this.$router.push('/');
 
-      window.dispatchEvent( new CustomEvent("sessionEstablished", {detail: null}) )
+      // replace this
+      const { forwardRequest } = event.detail
+      if (forwardRequest) this.$router.push('/');
+
+      // window.dispatchEvent( new CustomEvent("sessionEstablished", {detail: null}) )
     },
     logoutHandler(event) {
       this.clearUserId()
