@@ -7,10 +7,10 @@
       <router-link to="/about">About</router-link> |
       <span v-if="$store.getters.isLoggedIn">
         <router-link to="/deleteMyData">Delete My Data</router-link> |
-        <a href="#logout" onclick="facebookLogout()">Logout</a>
+        <a href="#logout" onclick="facebookExpireAccessToken()">Logout</a>
       </span>
       <span v-if="!$store.getters.isLoggedIn">
-        <a href="#login" onclick="facebookLogin()">Login</a>
+        <a href="#login" onclick="facebookLogin({forwardRequest: '/'})">Login</a>
       </span>
     </div>
     <router-view/>
@@ -38,14 +38,19 @@ export default {
       this.setUserId((event.detail || {}).userId)
 
       // replace this
+      // console.log(">>>event.detail", event.detail)
       const { forwardRequest } = event.detail
-      if (forwardRequest) this.$router.push('/');
+      if (forwardRequest) this.$router.push(forwardRequest).catch(() => {});
+      // this.$router.push('/')
 
       // window.dispatchEvent( new CustomEvent("sessionEstablished", {detail: null}) )
     },
     logoutHandler(event) {
       this.clearUserId()
-      this.$router.push('/login');
+
+      const { forwardRequest } = event.detail
+      // console.log(">>logoutHandler", forwardRequest || '/login')
+      this.$router.push(forwardRequest || '/login');
     },
   },
   mounted() {

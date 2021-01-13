@@ -27,9 +27,13 @@ export default {
   methods: {
     deleteMyData() {
         deleteUserData(this, (results) => {
+          console.log(">>>results", results)
           if (results.ok) {
-            this.message = "Your data has been succesfully removed from the system"
-            setTimeout(() => this.$router.push('/'), 3000)
+            this.message = "Your data has been succesfully removed from the system.  We hope you come back!"
+            setTimeout(() => {
+              facebookExpireAccessToken({forwardRequest: '/about'})
+              this.$router.push('/about')
+            }, 5000)
 
           } else {
             this.message = "Sorry; something went wrong.  Please contact the developer and ask him to remove your data or fix this bug!"

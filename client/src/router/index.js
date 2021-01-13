@@ -49,27 +49,32 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  console.log(">>>to.name", to.name, store.getters.isLoggedIn)
-  if (to.name === 'Login' && store.getters.isLoggedIn) {
-    const searchParams = new URLSearchParams(window.location.search);
-    console.log(">>>searchParams", searchParams)
+const beforeEachHandler = (to, from, next) => {
+  if (!window.FB) return setTimeout(() => beforeEachHandler(to, from, next), 1000)
 
-    if (searchParams.has("redirect")) {
-      console.log('searchParams.get("redirect")', searchParams.get("redirect"))
-      return next({ path: `${searchParams.get("redirect")}` })
-    }
+  const isLoggedIn = (window.FB.getAccessToken() != null)
+  
+  // console.log(">>>to.name", to.name, store.getters.isLoggedIn)
+  // if (to.name === 'Login' && isLoggedIn) {
+  //   const searchParams = new URLSearchParams(window.location.search);
+  //   // console.log(">>>searchParams", searchParams)
+
+  //   if (searchParams.has("redirect")) {
+  //     // console.log('searchParams.get("redirect")', searchParams.get("redirect"))
+  //     return next({ path: `${searchParams.get("redirect")}` })
+  //   }
     
-    // console.log(">>>redirecting to 'Home'")
-    return next({ name: 'Home' })
-  }
+  //   console.log(">>>redirecting to 'Home'")
+  //   return next({ name: 'Home' })
+  // }
   
   if (to.matched.some(record => record.meta.requiresAuth)) {
     
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!store.getters.isLoggedIn) {
-    console.log(">>>going to login", { redirect: to.fullPath })
+
+    if ( !isLoggedIn ) {
+      // console.log(">>>going to login", { redirect: to.fullPath })
       next({ name: 'Login', 
         query: { redirect: to.fullPath }
       })
@@ -79,6 +84,8 @@ router.beforeEach((to, from, next) => {
   } else {
     next() // does not require auth, make sure to always call next()!
   }
-})
+}
+
+router.beforeEach(beforeEachHandler)
 
 export default router

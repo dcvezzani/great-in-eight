@@ -138,7 +138,7 @@ exports.calculatePoints = (data) => {
 
 exports.calculateWeeklyPoints = (data=[]) => {
   const extraData = {
-    exercisedAllDays: false, 
+    exercisedSixDays: false, 
     exercised30MinOneDay: false, 
     exercisePoints: [],
     exerciseAwardPoints: 0,
@@ -157,9 +157,12 @@ exports.calculateWeeklyPoints = (data=[]) => {
     return totalPoints
   }, 0)
 
-  extraData.exercisedAllDays = extraData.exercisePoints.every(entry => entry > 0) 
+  // if user exercises 6 days, one of those days will be a typical rest day
+  // all users get 2 penalty free rest days
+  const numberOfDaysExercised = (extraData.exercisePoints || []).filter(entry => entry > 0).length
+  extraData.exercisedSixDays = numberOfDaysExercised >= 6
 
-  if (extraData.exercisedAllDays && extraData.exercised30MinOneDay)
+  if (extraData.exercisedSixDays && extraData.exercised30MinOneDay)
     totalPoints += extraData.exerciseAwardPoints
 
   return totalPoints

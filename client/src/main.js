@@ -38,10 +38,12 @@ Vue.component('tabs', {
     },
     methods: {
         selectTab(selectedTab) {
-            this.tabs.forEach(tab => {
-                tab.isActive = (tab.name == selectedTab.name);
-                if (tab.isActive) tab.click()
-            });
+            this.tabs.forEach(tab => tab.isActive = false)
+            const tab = this.tabs.find(tab => tab.name == selectedTab.name)
+            if (tab) {
+              tab.isActive = true
+              tab.click()
+            }
         }
     }
 });

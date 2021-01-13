@@ -46,6 +46,7 @@
         });              
      */
               
+        window.FB = FB
       };
 
       (function(d, s, id){
@@ -56,26 +57,31 @@
          fjs.parentNode.insertBefore(js, fjs);
        }(document, 'script', 'facebook-jssdk'));
 
-      function facebookLogout() {
-        console.log(">>>facebookLogout")
+      function facebookExpireAccessToken({ forwardRequest }={}) {
+        // console.log(">>>facebookExpireAccessToken")
 
         if ( !FB.getAccessToken() ) {
           console.log(">>>user not currently logged in; no need to logout")
           return false
         }
 
-        FB.logout(function(response) {
-          console.log(">>>response (FB.logout)", response)
-          logout()
-        });              
+        FB.api('/me/permissions', 'DELETE', {}, function(apiResponse) { 
+          // console.log(">>>response (restoreSession, FB.api, permissions)", apiResponse)                    
+          logout({forwardRequest})
+        })
+              
+        // FB.logout(function(response) {
+        //   console.log(">>>response (FB.logout)", response)
+        //   logout()
+        // });              
       }
 
-      function facebookLogin() {
-        console.log(">>>facebookLogin")
+      function facebookLogin({ forwardRequest }={}) {
+        // console.log(">>>facebookLogin")
 
         FB.login(function(response) {
-          console.log(">>>response (facebookLogin, FB.login)", response)
-          login()
+          // console.log(">>>response (facebookLogin, FB.login)", response)
+          login({forwardRequest})
 
           // handle the response
         }, {scope: 'public_profile,email', return_scopes: true});              
@@ -88,7 +94,7 @@
         }
 
         FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
-          console.log(">>>response (restoreSession, FB.api)", apiResponse)                    
+          // console.log(">>>response (restoreSession, FB.api)", apiResponse)                    
           const detail = { userId: apiResponse.id }
           window.dispatchEvent( new CustomEvent("restoreSession", {detail}) )
         })
@@ -96,19 +102,21 @@
         window.dispatchEvent( new CustomEvent("restoreSession", {detail: {}}) )
       }
 
-      function logout() {
-        window.dispatchEvent( new CustomEvent("logout", {detail: {}}) )
+      function logout(options={}) {
+        window.dispatchEvent( new CustomEvent("logout", {detail: options}) )
       }
 
       function login(options={}) {
+        // console.log(">>>login, options", options)
         if ( !FB.getAccessToken() ) {
           console.log(">>>Unable to log in; no access token active")
           return false
         }
 
         FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
-          console.log(">>>response (login, FB.api)", apiResponse)                    
-          const detail = { userId: apiResponse.id, forwardRequest: true, ...options }
+          // console.log(">>>response (login, FB.api)", apiResponse)                    
+          const detail = { userId: apiResponse.id, ...options }
+          // console.log(">>>me, details", detail)
           window.dispatchEvent( new CustomEvent("login", {detail}) )
         })
       }
@@ -117,7 +125,7 @@
     <!-- <div class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="true"></div> -->
     
     <!-- <button onclick="facebookLogin()">Facebook Login</button> -->
-    <!-- <button onclick="facebookLogout()">Facebook Logout</button> -->
+    <!-- <button onclick="facebookExpireAccessToken()">Facebook Logout</button> -->
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>

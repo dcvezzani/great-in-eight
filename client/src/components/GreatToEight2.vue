@@ -8,6 +8,11 @@
 
     <div class="header">
       <tabs>
+        <tab v-for="week in weeks" :key="week.id" :name="week.name" :selected="week.selected" :click="() => loadWeekData(week.id)">
+        </tab>
+      </tabs>
+      
+      <tabs>
         <tab v-for="day in days" :key="day.name" :name="day.name" :selected="day.selected" :click="() => loadDayTally(day.name)">
         </tab>
       </tabs>
@@ -97,9 +102,14 @@ export default {
       const dayOfWeek = this.payload.find(entry => entry.name === 'dayOfWeek')
       return (dayOfWeek) ? dayOfWeek.value : null
     },
+    currentWeek() {
+      const weekOfPeriod = this.payload.find(entry => entry.name === 'weekOfPeriod')
+      return (weekOfPeriod) ? weekOfPeriod.value : null
+    },
   },
   data() {
     return {
+      weeks: [],
       payload: [], 
       message: '',
       days: [
@@ -124,6 +134,12 @@ export default {
         saveUserData(this, (data) => {
           this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
         })
+    },
+    loadWeekData(weekId) {
+        console.log(">>>loadWeekData(weekId)", weekId)
+        // fetch data for given user id and week id
+        // populate payload
+        // load monday
     },
     loadDayTally(theDay) {
       this.payload = this.days.find(day => day.name === theDay).data
@@ -151,11 +167,11 @@ export default {
             break;
           }
           case 'reset-week-from-last-save': {
-            this.loadCurrentUserData()
+            this.loadCurrentUserAndWeekData()
             break;
           }
           case 'reset-day-from-last-save': {
-            this.loadCurrentUserData(this.currentDay)
+            this.loadCurrentUserAndWeekData(this.currentDay)
             break;
           }
         }
@@ -181,7 +197,7 @@ export default {
           // this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
         })
     },
-    loadCurrentUserData(currentDay=null) {
+    loadCurrentUserAndWeekData(currentDay=null) {
         loadUserData(this, (days) => {
           if (currentDay) {
               const idx = this.days.findIndex(day => day.name === currentDay)
@@ -211,7 +227,14 @@ export default {
     },
   },
   mounted() {
-    this.loadCurrentUserData()
+    this.loadCurrentUserAndWeekData()
+
+      let weekSelected = true
+      this.weeks =  [...new Array(8)].map((week, index) => ({
+        id: `${index+1}`,
+        name: `week-${(index+1).toString()}`,
+        selected: (index === 0),
+      }))
   },
 }
 </script>

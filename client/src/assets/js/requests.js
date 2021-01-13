@@ -1,12 +1,24 @@
-// const BASE_URL = 'https://10.0.0.54:3010/api'
-const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
+const BASE_URL = 'https://10.0.0.54:3010/api'
+// const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
+
+const getUserWeekUrlPath = (self) => {
+  const weekId = self.currentWeek || '1'
+  
+  return `${getUserUrlPath(self)}/week/${weekId}`
+}
+
+const getUserUrlPath = (self) => {
+  return `${BASE_URL}/user/${self.$store.state.userId}`
+}
 
 exports.saveUserData = (self, callback) => {
       (async () => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
 
-        const myPostRequest = new Request(BASE_URL, {
+        const weekId = self.currentWeek || '1'
+        const url = getUserWeekUrlPath(self)
+        const myPostRequest = new Request(url, {
           method: 'POST',
           headers: myHeaders,
           mode: 'cors',
@@ -17,7 +29,8 @@ exports.saveUserData = (self, callback) => {
         const data = await fetch(myPostRequest)
         .then(response => response.json())
         .catch(err => {
-          console.error(err)
+          console.error(`${err}: ${url}`)
+          self.message = `${err}: ${url}`
           return {ok: false}
         })
 
@@ -32,7 +45,8 @@ exports.deleteUserData = (self, callback) => {
         /* myHeaders.append('Content-Length', content.length.toString()); */
         /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
-        const url = `${BASE_URL}?userId=${self.$store.state.userId}`
+        // const url = `${BASE_URL}?userId=${self.$store.state.userId}`
+        const url = getUserUrlPath(self)
         const myDeleteRequest = new Request(url, {
           method: 'DELETE',
           headers: myHeaders,
@@ -49,6 +63,8 @@ exports.deleteUserData = (self, callback) => {
           return {ok: false}
         })
 
+        if (callback) callback(results)
+
       })()
 }
 
@@ -59,7 +75,8 @@ exports.loadUserData = (self, callback) => {
         /* myHeaders.append('Content-Length', content.length.toString()); */
         /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
-        const url = `${BASE_URL}?userId=${self.$store.state.userId}`
+        // const url = `${BASE_URL}?userId=${self.$store.state.userId}&weekId=${weekId}`
+        const url = getUserWeekUrlPath(self)
         const myGetRequest = new Request(url, {
           method: 'GET',
           headers: myHeaders,
