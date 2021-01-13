@@ -1,5 +1,5 @@
-const BASE_URL = 'https://10.0.0.54:3010/api'
-// const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
+// const BASE_URL = 'https://10.0.0.54:3010/api'
+const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
 
 const getUserWeekUrlPath = (self) => {
   const weekId = self.currentWeek || '1'
