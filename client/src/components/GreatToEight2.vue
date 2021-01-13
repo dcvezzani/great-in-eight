@@ -53,8 +53,9 @@
 
 import DayTally from './DayTally.vue'
 import { calculateWeeklyPoints, calculatePoints } from "../assets/js/points-calculator"
+import { saveUserData, loadNewFormData, loadUserData } from "../assets/js/requests"
 // const BASE_URL = 'https://10.0.0.54:3010/api'
-const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
+// const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
 
 const registerStickyHeader = () => {
 
@@ -122,26 +123,9 @@ export default {
       setTimeout(() => { this.message = null }, 3000)
     },
     save() {
-      (async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-
-        const myPostRequest = new Request(BASE_URL, {
-          method: 'POST',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-            body: JSON.stringify({days: this.days, userId: this.$store.state.userId}) // body data type must match "Content-Type" header
-        });
-
-        const data = await fetch(myPostRequest)
-        .then(response => response.json())
-        .catch(err => {
-          console.error(err)
-          return {ok: false}
+        saveUserData(this, (data) => {
+          this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
         })
-        this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
-      })()
     },
     loadDayTally(theDay) {
       this.payload = this.days.find(day => day.name === theDay).data
@@ -179,110 +163,53 @@ export default {
         }
     },
     loadNewFormData(currentDay=null) {
-      (async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        /* myHeaders.append('Content-Length', content.length.toString()); */
-        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+        loadNewFormData(this, (days) => {
+          if (currentDay) {
+              const idx = this.days.findIndex(day => day.name === currentDay)
+              console.log(">>>idx", idx)
+              this.days[idx] = days[idx]
 
-        const url = BASE_URL
-        const myGetRequest = new Request(url, {
-          method: 'GET',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-        });
+          } else {
+            this.days = days
+          }
 
-        const dailyTemplate = (
-          await fetch(myGetRequest)
-          .then(response => response.json())
-          .catch(err => {
-            console.error(`${err}: ${url}`)
-            this.message = `${err}: ${url}`
-            this.loaded = true
-            return {data: []}
-          })
-        ).data
+          this.loadDayTally("Mon")
+          this.loaded = true
 
-        const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        // [...new Array(7)]
-        let selected = true
-        const days = daysOfWeek.map(dayName => {
-            let day = JSON.parse(JSON.stringify(dailyTemplate))
-            day.find(entry => entry.type === 'dayOfWeek').value = dayName
-            day = {name: dayName, selected, data: day}
-            selected = false
-            return day
+          setTimeout(() => {
+            registerStickyHeader();
+          }, 150)
+            
+          // this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
         })
-
-        if (currentDay) {
-            const idx = this.days.findIndex(day => day.name === currentDay)
-            console.log(">>>idx", idx)
-            this.days[idx] = days[idx]
-
-        } else {
-          this.days = days
-        }
-
-        this.loadDayTally("Mon")
-        this.loaded = true
-
-        setTimeout(() => {
-          registerStickyHeader();
-        }, 150)
-      })()
-          
     },
     loadCurrentUserData(currentDay=null) {
-      (async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        /* myHeaders.append('Content-Length', content.length.toString()); */
-        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+        loadUserData(this, (days) => {
+          if (currentDay) {
+              const idx = this.days.findIndex(day => day.name === currentDay)
+              // console.log(">>>idx", idx)
+              this.days[idx] = days[idx]
 
-        const url = `${BASE_URL}?userId=${this.$store.state.userId}`
-        const myGetRequest = new Request(url, {
-          method: 'GET',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-        });
+          } else {
+            // console.log(">>>days", days[0].data)
+              if (!days[0].data) {
+                console.log(">>>No user data found.  Resetting form.")
+                return this.loadNewFormData(currentDay)
+              }
 
-        const days = (
-          await fetch(myGetRequest)
-          .then(response => response.json())
-          .catch(err => {
-            console.error(`${err}: ${url}`)
-            this.message = `${err}: ${url}`
-            this.loaded = true
-            return {data: []}
-          })
-        ).data
+            console.log(">>>Found user data!")
+            this.days = days
+          }
 
-        if (currentDay) {
-            const idx = this.days.findIndex(day => day.name === currentDay)
-            // console.log(">>>idx", idx)
-            this.days[idx] = days[idx]
+          this.loadDayTally("Mon")
+          this.loaded = true
 
-        } else {
-          // console.log(">>>days", days[0].data)
-            if (!days[0].data) {
-              console.log(">>>No user data found.  Resetting form.")
-              return this.loadNewFormData(currentDay)
-            }
-
-          console.log(">>>Found user data!")
-          this.days = days
-        }
-
-        this.loadDayTally("Mon")
-        this.loaded = true
-
-        setTimeout(() => {
-          registerStickyHeader();
-        }, 150)
-      })()
-          
+          setTimeout(() => {
+            registerStickyHeader();
+          }, 150)
+        
+          // this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
+        })
     },
   },
   mounted() {

@@ -27,5 +27,19 @@ router.post('/', function(req, res, next) {
   res.json({ ok: true });
 });
 
+router.delete('/', function(req, res, next) {
+  const filename = `${DATA_FILE_V2}-${req.query.userId}.json`
+  if (!req.query.userId || !fs.existsSync(filename)) return res.json({ ok: false })
+
+  try {
+    console.log(`>>>Deleting user data for: ${filename}`)
+    fs.unlinkSync(filename)
+    res.json({ ok: true });
+  } catch(err) {
+    console.error(">>>Unable to remove user's data")
+    res.json({ ok: false })
+  }
+});
+
 
 module.exports = router;

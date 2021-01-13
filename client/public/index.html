@@ -23,7 +23,7 @@
           
         FB.getLoginStatus(function(response) {
           console.log(">>>response (FB.getLoginStatus)", response)
-          login()
+                login({forwardRequest: false})
             // statusChangeCallback(response);
         });
 
@@ -83,7 +83,8 @@
         window.dispatchEvent( new CustomEvent("logout", {detail: {}}) )
       }
 
-      function login() {
+      function login(options={}) {
+        const { forwardRequest } = { forwardRequest: true, ...options }
         if ( !FB.getAccessToken() ) {
           console.log(">>>Unable to log in; no access token active")
           return false
@@ -91,7 +92,7 @@
 
         FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
           console.log(">>>response (FB.api)", apiResponse)                    
-          window.dispatchEvent( new CustomEvent("login", {detail: {userId: apiResponse.id}}) )
+          window.dispatchEvent( new CustomEvent("login", {detail: {userId: apiResponse.id, ...options}}) )
         })
       }
     </script>    

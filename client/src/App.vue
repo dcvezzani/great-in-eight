@@ -6,6 +6,7 @@
       </span>
       <router-link to="/about">About</router-link> |
       <span v-if="$store.getters.isLoggedIn">
+        <router-link to="/deleteMyData">Delete My Data</router-link> |
         <a href="#logout" onclick="facebookLogout()">Logout</a>
       </span>
       <span v-if="!$store.getters.isLoggedIn">
@@ -32,7 +33,7 @@ export default {
     },
     loginHandler(event) {
       this.setUserId((event.detail || {}).userId)
-      this.$router.push('/');
+      if (event.forwardRequest) this.$router.push('/');
     },
     logoutHandler(event) {
       this.clearUserId()

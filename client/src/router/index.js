@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import GreatToEight from '../components/GreatToEight.vue'
 import GreatToEight2 from '../components/GreatToEight2.vue'
 import Login from '../components/Login.vue'
+import DeleteMyData from '../components/DeleteMyData.vue'
 import store from '../store'
 
 Vue.use(VueRouter)
@@ -21,6 +22,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+  },
+  {
+    path: '/deleteMyData',
+    name: 'DeleteMyData',
+    component: DeleteMyData,
   },
   {
     path: '/about',
