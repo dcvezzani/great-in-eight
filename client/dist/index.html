@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico"><title>client</title><link href="/js/about.a44e9bbc.js" rel="prefetch"><link href="/css/app.9832dde7.css" rel="preload" as="style"><link href="/css/chunk-vendors.c94a4485.css" rel="preload" as="style"><link href="/js/app.b611d128.js" rel="preload" as="script"><link href="/js/chunk-vendors.542e0694.js" rel="preload" as="script"><link href="/css/chunk-vendors.c94a4485.css" rel="stylesheet"><link href="/css/app.9832dde7.css" rel="stylesheet"></head><body><script>console.log(">>>facebook stuff")
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '429496904859517',
+          cookie     : true,
+          xfbml      : true,
+          version    : "v9.0",
+        });
+          
+        FB.AppEvents.logPageView();   
+          
+        FB.getLoginStatus(function(response) {
+          console.log(">>>response (FB.getLoginStatus)", response)
+          login()
+            // statusChangeCallback(response);
+        });
+
+
+              /*
+
+        setTimeout(() => {
+          FB.login(function(response) {
+                  console.log(">>>response (FB.login)", response)
+            // handle the response
+          }, {scope: 'public_profile,email'});              
+        }, 3000)
+
+
+        FB.logout(function(response) {
+                console.log(">>>response (FB.logout)", response)
+          // handle the response
+        });              
+     */
+              
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+
+      function facebookLogout() {
+        console.log(">>>facebookLogout")
+
+        if ( !FB.getAccessToken() ) {
+          console.log(">>>user not currently logged in; no need to logout")
+          return false
+        }
+
+        FB.logout(function(response) {
+          console.log(">>>response (FB.logout)", response)
+          logout()
+        });              
+      }
+
+      function facebookLogin() {
+        console.log(">>>facebookLogin")
+
+        FB.login(function(response) {
+          console.log(">>>response (FB.login)", response)
+          login()
+
+          // handle the response
+        }, {scope: 'public_profile,email', return_scopes: true});              
+      }
+
+      function logout() {
+        window.dispatchEvent( new CustomEvent("logout", {detail: {}}) )
+      }
+
+      function login() {
+        if ( !FB.getAccessToken() ) {
+          console.log(">>>Unable to log in; no access token active")
+          return false
+        }
+
+        FB.api('/me', {fields: 'name,email'}, function(apiResponse) { 
+          console.log(">>>response (FB.api)", apiResponse)                    
+          window.dispatchEvent( new CustomEvent("login", {detail: {userId: apiResponse.id}}) )
+        })
+      }</script><noscript><strong>We're sorry but client doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div><script src="/js/chunk-vendors.542e0694.js"></script><script src="/js/app.b611d128.js"></script></body></html>

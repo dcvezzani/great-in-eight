@@ -53,7 +53,8 @@
 
 import DayTally from './DayTally.vue'
 import { calculateWeeklyPoints, calculatePoints } from "../assets/js/points-calculator"
-const BASE_URL = 'https://10.0.0.54:3010'
+// const BASE_URL = 'https://10.0.0.54:3010/api'
+const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
 
 const registerStickyHeader = () => {
 
@@ -196,7 +197,7 @@ export default {
           await fetch(myGetRequest)
           .then(response => response.json())
           .catch(err => {
-              console.error(`${err}: ${url}`)
+            console.error(`${err}: ${url}`)
             this.message = `${err}: ${url}`
             this.loaded = true
             return {data: []}
@@ -251,6 +252,7 @@ export default {
           await fetch(myGetRequest)
           .then(response => response.json())
           .catch(err => {
+            console.error(`${err}: ${url}`)
             this.message = `${err}: ${url}`
             this.loaded = true
             return {data: []}
@@ -259,10 +261,17 @@ export default {
 
         if (currentDay) {
             const idx = this.days.findIndex(day => day.name === currentDay)
-            console.log(">>>idx", idx)
+            // console.log(">>>idx", idx)
             this.days[idx] = days[idx]
 
         } else {
+          // console.log(">>>days", days[0].data)
+            if (!days[0].data) {
+              console.log(">>>No user data found.  Resetting form.")
+              return this.loadNewFormData(currentDay)
+            }
+
+          console.log(">>>Found user data!")
           this.days = days
         }
 

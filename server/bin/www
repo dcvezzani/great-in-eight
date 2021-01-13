@@ -6,7 +6,7 @@
 
 var app = require('../app');
 var debug = require('debug')('server:server');
-var http = require('http');
+var http = (process.env.NODE_ENV === 'local') ? require('https') : require('http');
 // const https = require('https')
 const fs = require('fs')
 
@@ -23,9 +23,19 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server 
+
+if (process.env.NODE_ENV === 'local') {
+  server = http.createServer({
+    key: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.key`),
+    cert: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.cert`),
+  }, app)
+} else {
+  server = http.createServer(app);
+}
 
 /*
+server = http.createServer(app);
 var server = https.createServer({
   key: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.key`),
   cert: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.cert`),
