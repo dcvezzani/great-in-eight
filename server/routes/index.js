@@ -6,7 +6,7 @@ var fs = require('fs');
 const DATA_FILE = `${process.env.FILE_BASE_PATH}/server/userData/data-template.json`
 const SERVER_ROOT_PATH = `${process.env.FILE_BASE_PATH}/server`
 
-const DEFAULT_ID_ARGS = {userId: null, weekId: "1"}
+const DEFAULT_ID_ARGS = {userId: null, weekId: "1", force: false}
 
 const getUserDataDirPath = (options={}) => {
   const { userId, weekId } = {...DEFAULT_ID_ARGS, ...options}
@@ -22,15 +22,16 @@ const getUserDataDirPath = (options={}) => {
 }
 
 const getUserDataFilePath = (options={}) => {
-  const { userId, weekId } = {...DEFAULT_ID_ARGS, ...options}
+  const { userId, weekId, force } = {...DEFAULT_ID_ARGS, ...options}
 
   if (!userId) return null
 
   const userDataDir = getUserDataDirPath(options)
+  // console.log(">>>userDataDir, ", userDataDir, { userId, weekId, force })
 
   const filename = `${userDataDir}/data-${userId}-${weekId}.json`
   // console.log(">>>getUserDataFilePath, filename", filename)
-  if (!fs.existsSync(filename)) return null
+  if (!force && !fs.existsSync(filename)) return null
 
   // console.log(">>>getUserDataFilePath, filename [2]", filename)
   return filename
@@ -48,7 +49,9 @@ router.get('/user/:userId/week/:weekId', function(req, res, next) {
 router.post('/user/:userId/week/:weekId', function(req, res, next) {
   const payload = req.body
 
-  const filename = getUserDataFilePath(payload)
+  const filename = getUserDataFilePath({...req.params, force: true})
+  // console.log(">>>filename", filename, req.params)
+  // return res.json({ ok: true });
   
   fs.writeFileSync(filename, JSON.stringify(payload.days))
   res.json({ ok: true });

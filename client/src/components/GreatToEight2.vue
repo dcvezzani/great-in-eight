@@ -26,11 +26,11 @@
           </li>
         </ul>
       </div>
+
+      <div>{{message}}</div>
     </div>
       
     <div class="content-pane">
-      <div>{{message}}</div>
-
       <DayTally :data="payload" v-if="payload"></DayTally>
     </div>
 
@@ -137,6 +137,54 @@ export default {
     },
     loadWeekData(weekId) {
         console.log(">>>loadWeekData(weekId)", weekId)
+
+        loadUserData(this, {weekId}, (days) => {
+
+          const weekDataExistsForUser = !!(days[0].data)
+          console.log(">>>days", days[0].data, weekDataExistsForUser)
+
+          if (weekDataExistsForUser) {
+            console.log(">>>Found user data!")
+            this.days = days
+            this.loadDayTally("Mon")
+            this.loaded = true
+
+          } else {
+            console.log(">>>Loading new data")
+            this.loadNewFormData(null, weekId)
+              
+          }
+
+          // if the first object in the array has a 'data' property, there is data for the user
+          // else the user doesn't yet have data for the specified week and needs to create one
+          // using the template data that was returned
+
+          // if (dayOfWeek) {
+          //     const idx = this.days.findIndex(day => day.name === dayOfWeek)
+          //     // console.log(">>>idx", idx)
+          //     this.days[idx] = days[idx]
+
+          // } else {
+          //   // console.log(">>>days", days[0].data)
+          //     if (!days[0].data) {
+          //       console.log(">>>No user data found.  Resetting form.")
+          //       return this.loadNewFormData(dayOfWeek)
+          //     }
+
+          //   console.log(">>>Found user data!")
+          //   this.days = days
+          // }
+
+          // this.loadDayTally("Mon")
+          // this.loaded = true
+
+          // setTimeout(() => {
+          //   registerStickyHeader();
+          // }, 150)
+        
+          // this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
+        })
+        
         // fetch data for given user id and week id
         // populate payload
         // load monday
@@ -176,10 +224,10 @@ export default {
           }
         }
     },
-    loadNewFormData(currentDay=null) {
-        loadNewFormData(this, (days) => {
-          if (currentDay) {
-              const idx = this.days.findIndex(day => day.name === currentDay)
+    loadNewFormData(dayOfWeek=null, weekId) {
+        loadNewFormData(this, {weekId}, (days) => {
+          if (dayOfWeek) {
+              const idx = this.days.findIndex(day => day.name === dayOfWeek)
               console.log(">>>idx", idx)
               this.days[idx] = days[idx]
 
@@ -190,17 +238,17 @@ export default {
           this.loadDayTally("Mon")
           this.loaded = true
 
-          setTimeout(() => {
-            registerStickyHeader();
-          }, 150)
+          // setTimeout(() => {
+          //   registerStickyHeader();
+          // }, 150)
             
           // this.toast((data.ok) ? "Data was successfully saved!" : "Data was not saved")
         })
     },
-    loadCurrentUserAndWeekData(currentDay=null) {
-        loadUserData(this, (days) => {
-          if (currentDay) {
-              const idx = this.days.findIndex(day => day.name === currentDay)
+    loadCurrentUserAndWeekData(dayOfWeek=null, weekId) {
+        loadUserData(this, {weekId}, (days) => {
+          if (dayOfWeek) {
+              const idx = this.days.findIndex(day => day.name === dayOfWeek)
               // console.log(">>>idx", idx)
               this.days[idx] = days[idx]
 
@@ -208,7 +256,7 @@ export default {
             // console.log(">>>days", days[0].data)
               if (!days[0].data) {
                 console.log(">>>No user data found.  Resetting form.")
-                return this.loadNewFormData(currentDay)
+                return this.loadNewFormData(dayOfWeek)
               }
 
             console.log(">>>Found user data!")
@@ -232,7 +280,7 @@ export default {
       let weekSelected = true
       this.weeks =  [...new Array(8)].map((week, index) => ({
         id: `${index+1}`,
-        name: `week-${(index+1).toString()}`,
+        name: `w${(index+1).toString()}`,
         selected: (index === 0),
       }))
   },

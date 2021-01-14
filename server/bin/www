@@ -27,8 +27,8 @@ var server
 
 if (process.env.NODE_ENV === 'local') {
   server = http.createServer({
-    key: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.key`),
-    cert: fs.readFileSync(`${CERTS_BASE_PATH}/server-10.0.0.54.3010.cert`),
+    key: fs.readFileSync(`${CERTS_BASE_PATH}/server-192.168.86.32.3010.key`),
+    cert: fs.readFileSync(`${CERTS_BASE_PATH}/server-192.168.86.32.3010.cert`),
   }, app)
 } else {
   server = http.createServer(app);

@@ -1,23 +1,23 @@
-// const BASE_URL = 'https://10.0.0.54:3010/api'
-const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
+const BASE_URL = 'https://192.168.86.32:3010/api'
+// const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
 
-const getUserWeekUrlPath = (self) => {
-  const weekId = self.currentWeek || '1'
-  
-  return `${getUserUrlPath(self)}/week/${weekId}`
+const getUserWeekUrlPath = ({userId, weekId}) => {
+  return `${getUserUrlPath({userId})}/week/${weekId}`
 }
 
-const getUserUrlPath = (self) => {
-  return `${BASE_URL}/user/${self.$store.state.userId}`
+const getUserUrlPath = ({userId}) => {
+  return `${BASE_URL}/user/${userId}`
 }
 
 exports.saveUserData = (self, callback) => {
-      (async () => {
+      const {userId}  = self.$store.state
+
+      ;(async () => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
 
         const weekId = self.currentWeek || '1'
-        const url = getUserWeekUrlPath(self)
+        const url = getUserWeekUrlPath({userId, weekId})
         const myPostRequest = new Request(url, {
           method: 'POST',
           headers: myHeaders,
@@ -39,14 +39,16 @@ exports.saveUserData = (self, callback) => {
 }
 
 exports.deleteUserData = (self, callback) => {
-      (async () => {
+      const {userId}  = self.$store.state
+
+      ;(async () => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
         /* myHeaders.append('Content-Length', content.length.toString()); */
         /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
         // const url = `${BASE_URL}?userId=${self.$store.state.userId}`
-        const url = getUserUrlPath(self)
+        const url = getUserUrlPath({userId})
         const myDeleteRequest = new Request(url, {
           method: 'DELETE',
           headers: myHeaders,
@@ -68,15 +70,19 @@ exports.deleteUserData = (self, callback) => {
       })()
 }
 
-exports.loadUserData = (self, callback) => {
-      (async () => {
+exports.loadUserData = (self, options={}, callback) => {
+      const dayOfWeek = options.dayOfWeek || 'mon'
+      const weekId = options.weekId || '1'
+      const userId = self.$store.state.userId
+
+      ;(async () => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
         /* myHeaders.append('Content-Length', content.length.toString()); */
         /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
         // const url = `${BASE_URL}?userId=${self.$store.state.userId}&weekId=${weekId}`
-        const url = getUserWeekUrlPath(self)
+        const url = getUserWeekUrlPath({userId, weekId})
         const myGetRequest = new Request(url, {
           method: 'GET',
           headers: myHeaders,
@@ -100,8 +106,12 @@ exports.loadUserData = (self, callback) => {
       })()
 }
 
-exports.loadNewFormData = (self, callback) => {
-      (async () => {
+exports.loadNewFormData = (self, options={}, callback) => {
+      // const dayOfWeek = options.dayOfWeek || 'mon'
+      const weekId = options.weekId || '1'
+      // const userId = self.$store.state.userId;
+
+      ;(async () => {
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/json');
         /* myHeaders.append('Content-Length', content.length.toString()); */
@@ -131,6 +141,7 @@ exports.loadNewFormData = (self, callback) => {
         let selected = true
         const days = daysOfWeek.map(dayName => {
             let day = JSON.parse(JSON.stringify(dailyTemplate))
+            day.find(entry => entry.type === 'weekOfPeriod').value = weekId
             day.find(entry => entry.type === 'dayOfWeek').value = dayName
             day = {name: dayName, selected, data: day}
             selected = false
