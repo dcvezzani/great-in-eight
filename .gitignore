@@ -22,6 +22,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-server/data-*.json
-server/userData
+server/userData/
 *.tar

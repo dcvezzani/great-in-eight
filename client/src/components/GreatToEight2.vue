@@ -140,18 +140,20 @@ export default {
 
         loadUserData(this, {weekId}, (days) => {
 
+          const currentDay = this.currentDay || 'Mon'
           const weekDataExistsForUser = !!(days[0].data)
           console.log(">>>days", days[0].data, weekDataExistsForUser)
 
           if (weekDataExistsForUser) {
             console.log(">>>Found user data!")
             this.days = days
-            this.loadDayTally("Mon")
+            this.loadDayTally(currentDay)
             this.loaded = true
 
           } else {
             console.log(">>>Loading new data")
             this.loadNewFormData(null, weekId)
+            this.loadDayTally(currentDay)
               
           }
 

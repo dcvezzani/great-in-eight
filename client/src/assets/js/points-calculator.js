@@ -38,6 +38,14 @@ class PointsCalculator {
     const rule = this.exercise.rules.find(rule => rule.name === 'exerciseOnRestDay')
     return rule.points
   }
+  get exerciseRestDays() {
+    const rule = this.exercise.rules.find(rule => rule.name === 'restDay')
+    return rule
+  }
+  get maxWeeklyPoints() {
+    const rule = this.exercise.rules.find(rule => rule.name === 'maxWeeklyPoints')
+    return rule
+  }
 
   get exercisedAtLeast30Min() {
       const rule = this.exercise.rules.find(rule => rule.name === 'exerciseOnRestDay')
@@ -119,16 +127,22 @@ class PointsCalculator {
       return { pts, bonus }
   }
 
-  calculate() {
+  calculate(options={}) {
+    const exclude = options.exclude || []
+
     let positiveFoodsPts = this.positiveFoodsPts + this.fruitsVegetablesPts.pts
     if (positiveFoodsPts > 10) positiveFoodsPts = 10
     positiveFoodsPts = positiveFoodsPts + this.fruitsVegetablesPts.bonus
 
-    return [
+    const calculationInput = [
       positiveFoodsPts, this.negativeFoodsPts,
-      this.waterPts, this.exercisePts,
+      this.waterPts, 
       this.afterEightPts, this.dailyGreatnessPts, this.personalPrayerPts, this.scriptureStudyPts
-    ].reduce((totalPnts, pnts) => totalPnts + pnts, 0)
+    ]
+
+    if (!exclude.includes('exercise')) calculationInput.push( this.exercisePts )
+
+    return calculationInput.reduce((totalPnts, pnts) => totalPnts + pnts, 0)
   }
 }
 
@@ -138,10 +152,13 @@ exports.calculatePoints = (data) => {
 
 exports.calculateWeeklyPoints = (data=[]) => {
   const extraData = {
-    exercisedSixDays: false, 
+    exercisedExtraDays: false, 
     exercised30MinOneDay: false, 
     exercisePoints: [],
     exerciseAwardPoints: 0,
+    exerciseRequiredDays: 5,
+    exerciseRestRule: null,
+    maxWeeklyPointsRule: null,
   }
 
   let totalPoints = data.reduce((totalPoints, day) => {
@@ -149,21 +166,36 @@ exports.calculateWeeklyPoints = (data=[]) => {
       const pointsCalculator = new PointsCalculator(day.data)
       if (pointsCalculator.exercisedAtLeast30Min) extraData.exercised30MinOneDay = true
       extraData.exercisePoints.push(pointsCalculator.exercisePts)
-      if (!extraData.exerciseAwardPoints) extraData.exerciseAwardPoints = pointsCalculator.exerciseAwardPoints
 
-      return totalPoints + pointsCalculator.calculate()
+      // grab this value for later
+      if (!extraData.exerciseAwardPoints) extraData.exerciseAwardPoints = pointsCalculator.exerciseAwardPoints
+      if (!extraData.exerciseRestRule) extraData.exerciseRestRule = pointsCalculator.exerciseRestDays
+      if (!extraData.maxWeeklyPointsRule) extraData.maxWeeklyPointsRule = pointsCalculator.maxWeeklyPoints
+
+
+      return totalPoints + pointsCalculator.calculate({exclude: ['exercise']})
     }
 
     return totalPoints
   }, 0)
 
-  // if user exercises 6 days, one of those days will be a typical rest day
+  // if user exercises 6 days, one of those days would be a typical rest day 
+  // user should get extra points for exercising on one of their rest days
   // all users get 2 penalty free rest days
   const numberOfDaysExercised = (extraData.exercisePoints || []).filter(entry => entry > 0).length
-  extraData.exercisedSixDays = numberOfDaysExercised >= 6
+  extraData.exercisedExtraDays = numberOfDaysExercised > extraData.exerciseRequiredDays
+  let bonusExercisePoints = 0
 
-  if (extraData.exercisedSixDays && extraData.exercised30MinOneDay)
+  // rest points
+  const restDayPoints = extraData.exerciseRestRule.points * extraData.exerciseRestRule.maxCount
+  totalPoints = extraData.exercisePoints.reduce((sum, points) => sum += points) + restDayPoints
+  
+  // add bonus points
+  if (extraData.exercisedExtraDays && extraData.exercised30MinOneDay)
     totalPoints += extraData.exerciseAwardPoints
+
+  // cap off
+  if (totalPoints > extraData.maxWeeklyPointsRule.points) totalPoints = extraData.maxWeeklyPointsRule.points
 
   return totalPoints
 }

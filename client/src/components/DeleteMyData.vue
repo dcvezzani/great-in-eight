@@ -32,7 +32,7 @@ export default {
             this.message = "Your data has been succesfully removed from the system.  We hope you come back!"
             setTimeout(() => {
               facebookExpireAccessToken({forwardRequest: '/about'})
-              this.$router.push('/about')
+              // this.$router.push('/about')
             }, 5000)
 
           } else {
