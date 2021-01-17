@@ -262,16 +262,19 @@ exports.calculateWeeklyPoints = (_data={}) => {
   extraData.exercisedExtraDays = numberOfDaysExercised > extraData.exerciseRequiredDays
   let bonusExercisePoints = 0
 
-  // rest points
-  const restDayPoints = extraData.exerciseRestRule.points * extraData.exerciseRestRule.maxCount
-  totalPoints += extraData.exercisePoints.reduce((sum, points) => sum += points) + restDayPoints
+  // exercise points
+  let exercisePoints = extraData.exercisePoints.reduce((sum, points) => sum += points)
   
-  // add bonus points
+  // add rest points to exercise points
+  const restDayPoints = extraData.exerciseRestRule.points * extraData.exerciseRestRule.maxCount
+  exercisePoints +=  restDayPoints
+  
+  // add exercise bonus points
   if (extraData.exercisedExtraDays && extraData.exercised30MinOneDay)
-    totalPoints += extraData.exerciseAwardPoints
+    exercisePoints += extraData.exerciseAwardPoints
 
-  // cap off
-  if (totalPoints > extraData.maxWeeklyPointsRule.points) totalPoints = extraData.maxWeeklyPointsRule.points
+  // cap off exercise points
+  if (exercisePoints > extraData.maxWeeklyPointsRule.points) exercisePoints = extraData.maxWeeklyPointsRule.points
 
-  return totalPoints
+  return totalPoints + exercisePoints
 }
