@@ -6,8 +6,6 @@
 <!--   <a href="#contact">Contact</a> -->
 <!-- </div> -->
 
-    <div>{{message}}</div>
-
     <div v-if="loaded">
 
       <div class="header">
@@ -304,7 +302,6 @@ export default {
     }))
 
     this.toast("done with page initialization")
-    setTimeout(() => {this.loaded = true}, 2000)
   },
 }
 </script>

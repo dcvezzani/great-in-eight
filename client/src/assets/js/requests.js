@@ -1,5 +1,5 @@
-const BASE_URL = 'https://192.168.86.32:3010/api'
-// const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
+// const BASE_URL = 'https://192.168.86.32:3010/api'
+const BASE_URL = 'https://great-in-eight.vezzaniphotography.com/api'
 
 const getUserWeekUrlPath = ({userId, weekId}) => {
   return `${getUserUrlPath({userId})}/week/${weekId}`
