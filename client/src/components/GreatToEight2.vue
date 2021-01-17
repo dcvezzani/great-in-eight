@@ -304,6 +304,7 @@ export default {
     }))
 
     this.toast("done with page initialization")
+    setTimeout(() => {this.loaded = true}, 2000)
   },
 }
 </script>
