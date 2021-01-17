@@ -1,55 +1,62 @@
 <template>
-  <div class="great-to-eight" v-if="loaded">
+  <div class="great-to-eight">
 <!-- <div class="navbar"> -->
 <!--   <a href="#home">Home</a> -->
 <!--   <a href="#news">News</a> -->
 <!--   <a href="#contact">Contact</a> -->
 <!-- </div> -->
 
-    <div class="header">
-      <tabs>
-        <tab v-for="week in weeks" :key="week.id" :name="week.name" :selected="week.selected" :click="() => loadWeekData(week.id)">
-        </tab>
-      </tabs>
-      
-      <tabs>
-        <tab v-for="day in days" :key="day.name" :name="day.name" :selected="day.selected" :click="() => loadDayTally(day.name)">
-        </tab>
-      </tabs>
+    <div>{{message}}</div>
 
-      <div class="info">
+    <div v-if="loaded">
+
+      <div class="header">
+        <tabs>
+          <tab v-for="week in weeks" :key="week.id" :name="week.name" :selected="week.selected" :click="() => loadWeekData(week.id)">
+          </tab>
+        </tabs>
+        
+        <tabs>
+          <tab v-for="day in days" :key="day.name" :name="day.name" :selected="day.selected" :click="() => loadDayTally(day.name)">
+          </tab>
+        </tabs>
+
+        <div class="info">
+          <ul>
+            <li><div>Points for the week: {{totalPoints}}</div></li>
+            <li><div>{{currentDay}}: {{totalPointsForCurrentDay}}</div></li>
+            <li>
+              <button @click="save">Save</button>
+            </li>
+          </ul>
+        </div>
+
+        <div>{{message}}</div>
+      </div>
+        
+      <div class="content-pane">
+        <DayTally :data="payload" v-if="payload"></DayTally>
+      </div>
+
+      <div class="info page-footer">
         <ul>
-          <li><div>Points for the week: {{totalPoints}}</div></li>
-          <li><div>{{currentDay}}: {{totalPointsForCurrentDay}}</div></li>
+          <li><div></div></li>
+          <li><div></div></li>
           <li>
-            <button @click="save">Save</button>
+            <select id="pageFooterActions" name="pageFooterActions" @change="handlePageFooterActions($event, 'pageFooterActions')">
+              <option value="do-nothing">- Select action -</option>
+              <option value="reset-day-from-last-save">Reset day from last save</option>
+              <option value="reset-week-from-last-save">Reset week from last save</option>
+              <option value="reset-day">Reset day as new</option>
+              <option value="reset-week">Reset week as new</option>
+            </select>
+            <button @click="handlePageFooterActions($event, 'pageFooterActions')">Reset</button>
           </li>
         </ul>
       </div>
 
-      <div>{{message}}</div>
     </div>
-      
-    <div class="content-pane">
-      <DayTally :data="payload" v-if="payload"></DayTally>
-    </div>
-
-    <div class="info page-footer">
-      <ul>
-        <li><div></div></li>
-        <li><div></div></li>
-        <li>
-          <select id="pageFooterActions" name="pageFooterActions" @change="handlePageFooterActions($event, 'pageFooterActions')">
-            <option value="do-nothing">- Select action -</option>
-            <option value="reset-day-from-last-save">Reset day from last save</option>
-            <option value="reset-week-from-last-save">Reset week from last save</option>
-            <option value="reset-day">Reset day as new</option>
-            <option value="reset-week">Reset week as new</option>
-          </select>
-          <button @click="handlePageFooterActions($event, 'pageFooterActions')">Reset</button>
-        </li>
-      </ul>
-    </div>
+    
     
   </div>
 </template>
@@ -285,14 +292,18 @@ export default {
     },
   },
   mounted() {
+    this.message = "loading current user..."
     this.loadCurrentUserAndWeekData()
 
+    this.message = "build weeks..."
     let weekSelected = true
     this.weeks =  [...new Array(8)].map((week, index) => ({
       id: `${index+1}`,
       name: `w${(index+1).toString()}`,
       selected: (index === 0),
     }))
+
+    this.toast("done with page initialization")
   },
 }
 </script>
