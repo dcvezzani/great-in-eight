@@ -93,10 +93,12 @@ export default {
   },
   computed: {
     totalPoints() {
-      return calculateWeeklyPoints(this.days)
+      const totalWeeklyPoints = calculateWeeklyPoints({week: this.days, rules: this.rules})
+      // console.log(">>>totalPoints, totalWeeklyPoints", totalWeeklyPoints, this.rules)
+      return totalWeeklyPoints
     },
     totalPointsForCurrentDay() {
-      return calculatePoints(this.payload)
+      return calculatePoints({day: this.payload, rules: this.rules})
     },
     currentDay() {
       const dayOfWeek = this.payload.find(entry => entry.name === 'dayOfWeek')
@@ -122,6 +124,7 @@ export default {
         {name: "Sun", selected: false},
       ],
       loaded: false,
+      rules: [],
     }
   },
   methods: {
@@ -138,7 +141,8 @@ export default {
     loadWeekData(weekId) {
         console.log(">>>loadWeekData(weekId)", weekId)
 
-        loadUserData(this, {weekId}, (days) => {
+        loadUserData(this, {weekId}, ({data: days, rules}) => {
+          this.rules = (rules) ? rules : []
 
           const currentDay = this.currentDay || 'Mon'
           const weekDataExistsForUser = !!(days[0].data)
@@ -227,7 +231,9 @@ export default {
         }
     },
     loadNewFormData(dayOfWeek=null, weekId) {
-        loadNewFormData(this, {weekId}, (days) => {
+        loadNewFormData(this, {weekId}, ({ days, rules }) => {
+          this.rules = (rules) ? rules : []
+
           if (dayOfWeek) {
               const idx = this.days.findIndex(day => day.name === dayOfWeek)
               console.log(">>>idx", idx)
@@ -248,7 +254,9 @@ export default {
         })
     },
     loadCurrentUserAndWeekData(dayOfWeek=null, weekId) {
-        loadUserData(this, {weekId}, (days) => {
+        loadUserData(this, {weekId}, ({data: days, rules}) => {
+          this.rules = (rules) ? rules : []
+
           if (dayOfWeek) {
               const idx = this.days.findIndex(day => day.name === dayOfWeek)
               // console.log(">>>idx", idx)
@@ -279,12 +287,12 @@ export default {
   mounted() {
     this.loadCurrentUserAndWeekData()
 
-      let weekSelected = true
-      this.weeks =  [...new Array(8)].map((week, index) => ({
-        id: `${index+1}`,
-        name: `w${(index+1).toString()}`,
-        selected: (index === 0),
-      }))
+    let weekSelected = true
+    this.weeks =  [...new Array(8)].map((week, index) => ({
+      id: `${index+1}`,
+      name: `w${(index+1).toString()}`,
+      selected: (index === 0),
+    }))
   },
 }
 </script>

@@ -14,97 +14,27 @@
     "name": "positiveFoods",
     "title": "Positive Foods",
     "selectedId": "0",
-    "options": [
+    "rules": [
       {
-        "id": "0",
-        "points": 0
-      },
-      {
-        "id": "1",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "2",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "3",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "4",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "5",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "6",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "7",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "8",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "9",
-        "points": 1,
-        "name": ""
-      },
-      {
-        "id": "10",
-        "points": 1,
-        "name": ""
+        "name": "dailyPoints",
+        "points": 1
       }
     ],
+    "options": {"range": {"min": 0, "max": 10}},
     "fruitsAndVegetables": {
-      "points": 10,
-      "positiveFoodsPointsRequirement": 5,
       "selectedId": "0",
-      "options": [
+      "rules": [
         {
-          "id": "0",
-          "points": 0
+          "name": "dailyPoints",
+          "points": 1
         },
         {
-          "id": "1",
-          "points": 1,
-          "name": ""
-        },
-        {
-          "id": "2",
-          "points": 1,
-          "name": ""
-        },
-        {
-          "id": "3",
-          "points": 1,
-          "name": ""
-        },
-        {
-          "id": "4",
-          "points": 1,
-          "name": ""
-        },
-        {
-          "id": "5",
-          "points": 1,
-          "name": ""
+          "name": "fruitsAndVegetableBonusPoints",
+          "positiveFoodsRequirement": 5,
+          "points": 10
         }
-      ]
+      ],
+      "options": {"range": {"min": 0, "max": 5}}
     }
   },
   {
@@ -112,135 +42,66 @@
     "name": "negativeFoods",
     "title": "Negative Foods",
     "selectedId": "0",
-    "options": [
+    "rules": [
       {
-        "id": "0",
-        "points": 0
+        "name": "dailyPoints",
+        "points": -1
       },
       {
-        "id": "1",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "2",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "3",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "4",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "5",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "6",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "7",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "8",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "9",
-        "points": -1,
-        "name": ""
-      },
-      {
-        "id": "10",
-        "points": -1,
-        "name": ""
+        "name": "weeklyCheatThreshold",
+        "points": 2
       }
-    ]
+    ],
+    "options": {"range": {"min": 0, "max": 10, "pointValue": -1}}
   },
   {
     "type": "water",
     "name": "water",
     "title": "Water",
-    "points": 10,
     "selectedId": "0",
     "rules": [
       {
-        "week": "1",
+        "name": "dailyPoints",
+        "points": 10
+      },
+      {
+        "name": "week1DailyRequirement",
+        "week": 1,
         "cups": 4
       },
       {
-        "week": "2",
+        "name": "week2DailyRequirement",
+        "week": 2,
         "cups": 5
       },
       {
-        "week": "3",
+        "name": "week3DailyRequirement",
+        "week": 3,
         "cups": 6
       },
       {
-        "week": "4",
+        "name": "week4DailyRequirement",
+        "week": 4,
         "cups": 7
       },
       {
-        "week": "default",
+        "name": "defaultDailyRequirement",
+        "isDefault": true,
         "cups": 8
       }
     ],
-    "options": [
-      {
-        "id": "0",
-        "cups": 0
-      },
-      {
-        "id": "1",
-        "cups": 1
-      },
-      {
-        "id": "2",
-        "cups": 1
-      },
-      {
-        "id": "3",
-        "cups": 1
-      },
-      {
-        "id": "4",
-        "cups": 1
-      },
-      {
-        "id": "5",
-        "cups": 1
-      },
-      {
-        "id": "6",
-        "cups": 1
-      },
-      {
-        "id": "7",
-        "cups": 1
-      },
-      {
-        "id": "8",
-        "cups": 1
-      }
-    ]
+    "options": {"range": {"min": 0, "max": 8, "pointsLabel": "cups"}}
   },
   {
     "type": "afterEight",
     "name": "afterEight",
     "title": "After 8:00 pm",
-    "points": 5,
+    "rules": [
+      {
+        "name": "dailyPoints",
+        "points": 5
+      }
+    ],
     "options": [
       {
         "name": "nothingEaten",
@@ -306,7 +167,12 @@
     "type": "simple-checkbox",
     "name": "dailyGreatness",
     "title": "Daily Greatness",
-    "points": 5,
+    "rules": [
+      {
+        "name": "dailyPoints",
+        "points": 5
+      }
+    ],
     "options": [
       {
         "name": "dailyGreatness",
@@ -320,7 +186,12 @@
     "type": "simple-checkbox",
     "name": "personalPrayer",
     "title": "Personal Prayer",
-    "points": 5,
+    "rules": [
+      {
+        "name": "dailyPoints",
+        "points": 5
+      }
+    ],
     "options": [
       {
         "name": "personalPrayer",
@@ -334,7 +205,12 @@
     "type": "simple-checkbox",
     "name": "scriptureStudy",
     "title": "Scripture Study",
-    "points": 5,
+    "rules": [
+      {
+        "name": "dailyPoints",
+        "points": 5
+      }
+    ],
     "options": [
       {
         "name": "scriptureStudy",
@@ -345,4 +221,6 @@
     ]
   }
 ]
+
+
 

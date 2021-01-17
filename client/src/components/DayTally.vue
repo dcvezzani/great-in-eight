@@ -168,7 +168,7 @@ export default {
   },
   computed: {
     totalPoints() {
-        return (this.data) ? calculatePoints(this.data) : 0
+        return (this.data) ? calculatePoints({day: this.data, rules: this.$parent.rules}) : 0
     },
     positiveFoods() {
       return this.data.find(entry => entry.name == 'positiveFoods')
@@ -247,7 +247,7 @@ export default {
       document.getElementById('volume').value = event.target.value
     },
     onChange(event) {
-      console.log(">>>change detected", calculatePoints(this.data))
+      console.log(">>>change detected", calculatePoints({day: this.data, rules: this.$parent.rules}))
     },
     load() {
       this.positiveFoodsSlider = this.positiveFoods.selectedId.toString()

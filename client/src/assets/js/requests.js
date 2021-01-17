@@ -10,146 +10,180 @@ const getUserUrlPath = ({userId}) => {
 }
 
 exports.saveUserData = (self, callback) => {
-      const {userId}  = self.$store.state
+  const {userId}  = self.$store.state
 
-      ;(async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
+  ;(async () => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
 
-        const weekId = self.currentWeek || '1'
-        const url = getUserWeekUrlPath({userId, weekId})
-        const myPostRequest = new Request(url, {
-          method: 'POST',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-            body: JSON.stringify({days: self.days, userId: self.$store.state.userId}) // body data type must match "Content-Type" header
-        });
+    const weekId = self.currentWeek || '1'
+    const url = getUserWeekUrlPath({userId, weekId})
+    const myPostRequest = new Request(url, {
+      method: 'POST',
+      headers: myHeaders,
+      mode: 'cors',
+      cache: 'default',
+        body: JSON.stringify({days: self.days, userId: self.$store.state.userId}) // body data type must match "Content-Type" header
+    });
 
-        const data = await fetch(myPostRequest)
-        .then(response => response.json())
-        .catch(err => {
-          console.error(`${err}: ${url}`)
-          self.message = `${err}: ${url}`
-          return {ok: false}
-        })
+    const data = await fetch(myPostRequest)
+    .then(response => response.json())
+    .catch(err => {
+      console.error(`${err}: ${url}`)
+      self.message = `${err}: ${url}`
+      return {ok: false}
+    })
 
-        if (callback) callback(data)
-      })()
+    if (callback) callback(data)
+  })()
 }
 
 exports.deleteUserData = (self, callback) => {
-      const {userId}  = self.$store.state
+  const {userId}  = self.$store.state
 
-      ;(async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        /* myHeaders.append('Content-Length', content.length.toString()); */
-        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+  ;(async () => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+    /* myHeaders.append('Content-Length', content.length.toString()); */
+    /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
-        // const url = `${BASE_URL}?userId=${self.$store.state.userId}`
-        const url = getUserUrlPath({userId})
-        const myDeleteRequest = new Request(url, {
-          method: 'DELETE',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-        });
+    // const url = `${BASE_URL}?userId=${self.$store.state.userId}`
+    const url = getUserUrlPath({userId})
+    const myDeleteRequest = new Request(url, {
+      method: 'DELETE',
+      headers: myHeaders,
+      mode: 'cors',
+      cache: 'default',
+    });
 
-        const results = await fetch(myDeleteRequest)
-        .then(response => response.json())
-        .catch(err => {
-          console.error(`${err}: ${url}`)
-          self.message = `${err}: ${url}`
-          self.loaded = true
-          return {ok: false}
-        })
+    const results = await fetch(myDeleteRequest)
+    .then(response => response.json())
+    .catch(err => {
+      console.error(`${err}: ${url}`)
+      self.message = `${err}: ${url}`
+      self.loaded = true
+      return {ok: false}
+    })
 
-        if (callback) callback(results)
+    if (callback) callback(results)
 
-      })()
+  })()
 }
 
 exports.loadUserData = (self, options={}, callback) => {
-      const dayOfWeek = options.dayOfWeek || 'mon'
-      const weekId = options.weekId || '1'
-      const userId = self.$store.state.userId
+  const dayOfWeek = options.dayOfWeek || 'mon'
+  const weekId = options.weekId || '1'
+  const userId = self.$store.state.userId
 
-      ;(async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        /* myHeaders.append('Content-Length', content.length.toString()); */
-        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+  ;(async () => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+    /* myHeaders.append('Content-Length', content.length.toString()); */
+    /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
-        // const url = `${BASE_URL}?userId=${self.$store.state.userId}&weekId=${weekId}`
-        const url = getUserWeekUrlPath({userId, weekId})
-        const myGetRequest = new Request(url, {
-          method: 'GET',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-        });
+    // const url = `${BASE_URL}?userId=${self.$store.state.userId}&weekId=${weekId}`
+    const url = getUserWeekUrlPath({userId, weekId})
+    const myGetRequest = new Request(url, {
+      method: 'GET',
+      headers: myHeaders,
+      mode: 'cors',
+      cache: 'default',
+    });
 
-        const days = (
-          await fetch(myGetRequest)
-          .then(response => response.json())
-          .catch(err => {
-            console.error(`${err}: ${url}`)
-            self.message = `${err}: ${url}`
-            self.loaded = true
-            return {data: []}
-          })
-        ).data
+    const responsePayload = (
+      await fetch(myGetRequest)
+      .then(response => response.json())
+      .catch(err => {
+        console.error(`${err}: ${url}`)
+        self.message = `${err}: ${url}`
+        self.loaded = true
+        return {data: []}
+      })
+    )
 
-        if (callback) callback(days)
-  
-      })()
+    if (callback) callback(responsePayload)
+
+  })()
 }
 
+// exports.loadRulesData = (self, options={}, callback) => {
+//   ;(async () => {
+//     const myHeaders = new Headers();
+//     myHeaders.append('Content-Type', 'application/json');
+//     /* myHeaders.append('Content-Length', content.length.toString()); */
+//     /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+
+//     const url = `${BASE_URL}/rules`
+//     const myGetRequest = new Request(url, {
+//       method: 'GET',
+//       headers: myHeaders,
+//       mode: 'cors',
+//       cache: 'default',
+//     });
+
+//     const rules = (
+//       await fetch(myGetRequest)
+//       .then(response => response.json())
+//       .catch(err => {
+//         console.error(`${err}: ${url}`)
+//         self.message = `${err}: ${url}`
+//         self.loaded = true
+//         return {data: []}
+//       })
+//     ).rules
+
+//     if (callback) callback(rules)
+//   })()
+// }
+
 exports.loadNewFormData = (self, options={}, callback) => {
-      // const dayOfWeek = options.dayOfWeek || 'mon'
-      const weekId = options.weekId || '1'
-      // const userId = self.$store.state.userId;
+  // const dayOfWeek = options.dayOfWeek || 'mon'
+  const weekId = options.weekId || '1'
+  // const userId = self.$store.state.userId;
 
-      ;(async () => {
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        /* myHeaders.append('Content-Length', content.length.toString()); */
-        /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
+  ;(async () => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+    /* myHeaders.append('Content-Length', content.length.toString()); */
+    /* myHeaders.append('X-Custom-Header', 'ProcessThisImmediately'); */
 
-        const url = BASE_URL
-        const myGetRequest = new Request(url, {
-          method: 'GET',
-          headers: myHeaders,
-          mode: 'cors',
-          cache: 'default',
-        });
+    const url = BASE_URL
+    const myGetRequest = new Request(url, {
+      method: 'GET',
+      headers: myHeaders,
+      mode: 'cors',
+      cache: 'default',
+    });
 
-        const dailyTemplate = (
-          await fetch(myGetRequest)
-          .then(response => response.json())
-          .catch(err => {
-            console.error(`${err}: ${url}`)
-            self.message = `${err}: ${url}`
-            self.loaded = true
-            return {data: []}
-          })
-        ).data
+    const responsePayload = (
+      await fetch(myGetRequest)
+      .then(response => response.json())
+      .catch(err => {
+        console.error(`${err}: ${url}`)
+        self.message = `${err}: ${url}`
+        self.loaded = true
+        return {data: []}
+      })
+    )
+    // console.log(">>>responsePayload", responsePayload)
 
-        const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        // [...new Array(7)]
-        let selected = true
-        const days = daysOfWeek.map(dayName => {
-            let day = JSON.parse(JSON.stringify(dailyTemplate))
-            day.find(entry => entry.type === 'weekOfPeriod').value = weekId
-            day.find(entry => entry.type === 'dayOfWeek').value = dayName
-            day = {name: dayName, selected, data: day}
-            selected = false
-            return day
-        })
+    const dailyTemplate = responsePayload.userTemplate
 
-        if (callback) callback(days)
-        
-      })()
+    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    // console.log(">>>dailyTemplate", dailyTemplate)
+    // [...new Array(7)]
+    let selected = true
+    const days = daysOfWeek.map(dayName => {
+        let day = JSON.parse(JSON.stringify(dailyTemplate))
+        day.find(entry => entry.type === 'weekOfPeriod').value = weekId
+        day.find(entry => entry.type === 'dayOfWeek').value = dayName
+        day = {name: dayName, selected, data: day}
+        selected = false
+        return day
+    })
+
+    if (callback) callback({ days, rules: responsePayload.rules })
+    
+  })()
 }
 

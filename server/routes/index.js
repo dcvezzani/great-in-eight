@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
+var { parseRules } = require('../rules');
+var { getUserTemplate, applyUserTemplate } = require('../user-template');
 
 // const DATA_FILE = '/Users/dcvezzani/personal-projects/great-in-eight/server/data-template.json'
-const DATA_FILE = `${process.env.FILE_BASE_PATH}/server/userData/data-template.json`
+const DATA_FILE = `${process.env.FILE_BASE_PATH}/server/data-template.json`
 const SERVER_ROOT_PATH = `${process.env.FILE_BASE_PATH}/server`
 
 const DEFAULT_ID_ARGS = {userId: null, weekId: "1", force: false}
@@ -39,10 +41,28 @@ const getUserDataFilePath = (options={}) => {
 
 // get user data
 router.get('/user/:userId/week/:weekId', function(req, res, next) {
-  const filename = getUserDataFilePath(req.params) || DATA_FILE
+  let filename = getUserDataFilePath(req.params)
+  let userDataExists = true
+
+  if (!filename) {
+    userDataExists = false
+    filename = DATA_FILE
+  }
+
   const data = fs.readFileSync(filename).toString()
   console.log(">>>data [1]", req.params, data.slice(0,200))
-  res.json({ data: JSON.parse(data) });
+
+  const { rules } = getRules()
+  let userData = JSON.parse(data)
+  
+  if (userDataExists) {
+    const _templateData = fs.readFileSync(DATA_FILE).toString()
+    const templateData = JSON.parse(_templateData)
+
+    userData = applyUserTemplate(templateData, userData)
+  }
+  
+  res.json({ data: userData, rules });
 });
 
 // save user data
@@ -72,43 +92,36 @@ router.delete('/user/:userId', function(req, res, next) {
   }
 });
 
+// get rules
+router.get('/rules', function(req, res, next) {
+  const rules = getRules()
+  res.json(rules);
+});
+
 // get day template
 router.get('/', function(req, res, next) {
   let filename = DATA_FILE
 
   const data = fs.readFileSync(filename).toString()
   console.log(">>>data", data.slice(0,200))
-  res.json({ data: JSON.parse(data) });
-});
 
+  const userTemplate = getUserTemplate(JSON.parse(data))
+  console.log(">>>userTemplate", JSON.stringify(userTemplate).slice(0,200))
 
-
-
-
-// deprecated
-router.post('/', function(req, res, next) {
-  const payload = req.body
-
-  const filename = getUserDataFilePath(payload)
+  const { rules } = getRules()
   
-  fs.writeFileSync(filename, JSON.stringify(payload.days))
-  res.json({ ok: true });
+  res.json({userTemplate: userTemplate, rules});
 });
 
-// deprecated
-router.delete('/', function(req, res, next) {
-  const userDataDirPath = getUserDataDirPath(req.query)
-  if (!userDataDirPath || !fs.existsSync(userDataDirPath)) return res.json({ ok: false })
+const getRules = () => {
+  let filename = DATA_FILE
 
-  try {
-    console.log(`>>>Deleting user data for: ${userDataDirPath}`)
-    fs.rmdirSync(userDataDirPath, {recursive: true, maxRetries: 3, retryDelay: 1000})
-    res.json({ ok: true });
-  } catch(err) {
-    console.error(">>>Unable to remove user's data", err)
-    res.json({ ok: false })
-  }
-});
+  const data = fs.readFileSync(filename).toString()
+  console.log(">>>data", data.slice(0,200))
 
+  const rules = parseRules(JSON.parse(data))
+  console.log(">>>rules", JSON.stringify(rules).slice(0,200))
+  return rules
+}
 
 module.exports = router;
